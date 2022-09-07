@@ -5,5 +5,19 @@
 {% block page_content %}
 <div class="page-header">
     <h1>「{{ word }}」の検索結果</h1>
+    {% if results %}
+    {% for result in results %}
+    <h4>見出し語</h4>
+    <p>{{ ",".join(result.index) }}  </p>
+    <h4>発音</h4>
+    <p>{{ result.pronunciation }} </p>
+    <h4>意味</h4>
+    {% for meaning in result.meaning %}
+    <p>{{ meaning }}</p>
+    {% endfor %}
+    {% endfor %}
+    {% else %}
+    <p>見つかりませんでした。</p>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,8 +1,11 @@
-from flask import Flask, render_template, session, redirect,url_for, flash
+from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+
+from app.search import search
+
 
 app = Flask(__name__)
 
@@ -23,13 +26,14 @@ def index():
         word = form.word.data
         session['word'] = word
         form.word.data = ''
+        session['results'] = search(word)
         return redirect(url_for("search_results", word=word))
     return render_template('index.html', form=form)
 
 
 @app.route('/search-results/<word>')
 def search_results(word):
-    return render_template('search-results.html', word=word)
+    return render_template('search-results.html', word=word, results=session["results"])
 
 
 @app.errorhandler(404)
