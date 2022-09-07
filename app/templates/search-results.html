@@ -4,17 +4,31 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h1>「{{ word }}」の検索結果</h1>
+    <h2>「{{ word }}」の検索結果</h2>
+    <hr>
     {% if results %}
     {% for result in results %}
     <h4>見出し語</h4>
     <p>{{ ",".join(result.index) }}  </p>
     <h4>発音</h4>
-    <p>{{ result.pronunciation }} </p>
+    <p>/{{ result.pronunciation }}/、アクセント:{{ result.accent }} </p>
+    <h4>品詞</h4>
+    <p>[{{ result.pos }}]</p>
     <h4>意味</h4>
     {% for meaning in result.meaning %}
     <p>{{ meaning }}</p>
     {% endfor %}
+    <h4>備考・補足</h4>
+    {% if result['bungo-type'] %}
+    <p>文語の型:{{result['bungo-type'] }}</p>
+    {% endif %}
+    {% if result.remarks %}
+    <p>備考:{{ result.remarks }}</p>
+    {% endif %}
+    {% if result.amendment %}
+    <p>補足:{{ result.amendment }}</p>
+    {% endif %}
+    <hr>
     {% endfor %}
     {% else %}
     <p>見つかりませんでした。</p>
