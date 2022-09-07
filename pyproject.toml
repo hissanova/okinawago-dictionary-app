@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "okinawago-dictionary-heroku"
+version = "0.1.0"
+description = ""
+authors = ["Hisanobu Nakamura"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Flask = "^2.2.2"
+gunicorn = "^20.1.0"
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.971"
+flake8 = "^5.0.4"
+yapf = "^0.32.0"
+jedi = "^0.18.1"
+ipython = "^8.5.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
