@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}沖繩語辞典{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>沖縄語辞典</h1>
+    このページは沖縄語辞典アプリのページです。国立国語研究所の沖縄語辞典の単語を、カタカナの見出し語で検索できます。カタカナの表記は、沖縄県が策定した『沖縄県における「しまくとぅば」の表記について』に基づいています。
+
+</div>
+{{ wtf.quick_form(form) }}
+{% endblock %}
