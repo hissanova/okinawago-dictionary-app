@@ -3,7 +3,7 @@ from typing import Dict, List
 
 with open("app/static/okinawa_01.json", 'r') as raw_file:
     oki_dict = json.load(raw_file)
-key_dict:Dict[str, List[int]] = {}
+key_dict: Dict[str, List[int]] = {}
 content_dict = {}
 for i, entry in enumerate(oki_dict):
     for index in entry["index"]:
