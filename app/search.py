@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List
+from typing import Callable, Dict, List
 
 with open("app/static/okinawa_01.json", 'r') as raw_file:
     oki_dict = json.load(raw_file)
@@ -17,3 +17,22 @@ def search(word: str) -> List:
     if not keys:
         return []
     return [content_dict[key] for key in keys]
+
+
+def get_filter(word: str, search_type: str) -> Callable[[str], bool]:
+    if search_type == "startswith":
+        def filter_(key: str) -> bool:
+            return key.startswith(word)
+    elif search_type == "endswith":
+        def filter_(key: str) -> bool:
+            return key.endswith(word)
+    return filter_
+
+
+def _search(word: str, search_type: str) -> List[str]:
+    results = []
+    key_filter = get_filter(word, search_type)
+    for key in key_dict.keys():
+        if key_filter(key):
+            results.append(key)
+    return results
