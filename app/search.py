@@ -12,11 +12,11 @@ for i, entry in enumerate(oki_dict):
     content_dict[i] = entry
 
 
-def search(word: str) -> List:
-    keys = key_dict.get(word)
-    if not keys:
-        return []
-    return [content_dict[key] for key in keys]
+# def search(word: str) -> List:
+#     keys = key_dict.get(word)
+#     if not keys:
+#         return []
+#     return [content_dict[key] for key in keys]
 
 
 def get_filter(word: str, search_type: str) -> Callable[[str], bool]:
@@ -29,10 +29,17 @@ def get_filter(word: str, search_type: str) -> Callable[[str], bool]:
     return filter_
 
 
-def _search(word: str, search_type: str) -> List[str]:
+def search(word: str, search_type: str) -> List[str]:
     results = []
     key_filter = get_filter(word, search_type)
     for key in key_dict.keys():
         if key_filter(key):
             results.append(key)
     return results
+
+
+def get_contents(key_word):
+    keys = key_dict.get(key_word)
+    if not keys:
+        return []
+    return [content_dict[key] for key in keys]
