@@ -37,12 +37,10 @@ def index():
 @app.route('/search-results/<word>')
 def search_results(word):
     results = sorted(search(word, session["search_type"]))
-    print(f"len(search_results)={len(session['results'])}")
     return render_template('search-results.html',
                            word=word,
                            results=results,
-                           search_type=session['search_type'],
-                           results_len=len(results))
+                           search_type=session['search_type'])
 
 
 @app.route('/definition/<index_word>')

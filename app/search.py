@@ -12,13 +12,6 @@ for i, entry in enumerate(oki_dict):
     content_dict[i] = entry
 
 
-# def search(word: str) -> List:
-#     keys = key_dict.get(word)
-#     if not keys:
-#         return []
-#     return [content_dict[key] for key in keys]
-
-
 def get_filter(word: str, search_type: str) -> Callable[[str], bool]:
     if search_type == "startswith":
         def filter_(key: str) -> bool:
