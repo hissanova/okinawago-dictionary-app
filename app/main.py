@@ -36,7 +36,7 @@ def index():
 
 @app.route('/search-results/<word>')
 def search_results(word):
-    results = sorted(search(word, session["search_type"]))
+    results = search(word, session["search_type"])
     return render_template('search-results.html',
                            word=word,
                            results=results,
