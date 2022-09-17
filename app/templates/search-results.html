@@ -12,9 +12,11 @@
     <hr>
     {% if results %}
     <p>{{ results | length }}件の検索結果が見つかりました。
-    {% for result in results %}
-    <p><a href="/definition/{{ result }}">{{ result }}</a></p>
-    {% endfor %}
+	{% for result in results %}
+	<p>
+	    {{ loop.index }}. <a href="/definition/{{ result | first }}">{{ result | join(",") }}</a>
+	</p>
+	{% endfor %}
     {% else %}
     <p>見つかりませんでした。</p>
     {% endif %}

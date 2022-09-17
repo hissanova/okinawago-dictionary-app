@@ -22,13 +22,15 @@ def get_filter(word: str, search_type: str) -> Callable[[str], bool]:
     return filter_
 
 
-def search(word: str, search_type: str) -> List[str]:
-    results = []
-    key_filter = get_filter(word, search_type)
-    for key in key_dict.keys():
-        if key_filter(key):
-            results.append(key)
-    return results
+def search(word: str, search_type: str) -> List[List[str]]:
+    results_dict: Dict[int, List[str]] = {}
+    index_filter = get_filter(word, search_type)
+    for index_word in key_dict.keys():
+        if index_filter(index_word):
+            for id_key in key_dict[index_word]:
+                index_words = results_dict.setdefault(id_key, [])
+                results_dict[id_key] = index_words + [index_word]
+    return list(results_dict.values())
 
 
 def get_contents(key_word):
