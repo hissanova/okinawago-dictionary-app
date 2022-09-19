@@ -14,7 +14,7 @@
     <p>{{ results | length }}件の検索結果が見つかりました。
 	{% for result in results %}
 	<p>
-	    {{ loop.index }}. <a href="/definition/{{ result | first }}">{{ result | join(",") }}</a>
+	    {{ loop.index }}. <a href="/definition/{{ result | first | urlencode }}">{{ result | join(",") }}</a>
 	</p>
 	{% endfor %}
     {% else %}
