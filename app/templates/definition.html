@@ -7,6 +7,7 @@
     <h2>「{{ word }}」の意味</h2>
     <hr>
     {% if contents %}
+    {% if dict_type == "oki2yamato" %}
     {% for content in contents %}
     <h4>見出し語</h4>
     <p>{{ ",".join(content.index) }}  </p>
@@ -30,6 +31,19 @@
     {% endif %}
     <hr>
     {% endfor %}
+    {% elif  dict_type == "yamato2oki" %}
+    {% for content in contents %}    
+    <h4>見出し語</h4>
+    <p>{{ ",".join(content.index) }}  </p>
+    <h4>漢字</h4>
+    <p>{{ content.kanji }}</p>
+    <h4>説明</h4>
+    <p>{{ content.explanation }}</p>
+    <h4>内容</h4>
+    <p>{{ content.meaning }}</p>
+    <hr>
+    {% endfor %}    
+    {% endif %}
     {% else %}
     <p>見つかりませんでした。</p>
     {% endif %}

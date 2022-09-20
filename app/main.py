@@ -16,6 +16,7 @@ bootstrap = Bootstrap(app)
 
 class EnquiryForm(FlaskForm):
     word = StringField('見出し語（カタカナ）から検索', validators=[DataRequired()])
+    dict_type = RadioField('辞典選択', choices=[('oki2yamato', '沖→日'), ('yamato2oki', '日→沖')], default='oki2yamato')
     search_type = RadioField('検索方法', choices=[('startswith', '前方一致'), ('endswith', '後方一致')], default='startswith')
     submit = SubmitField('検索')
 
@@ -24,19 +25,19 @@ class EnquiryForm(FlaskForm):
 def index():
     form = EnquiryForm()
     if form.validate_on_submit():
-        word = form.word.data
+        session['word'] = form.word.data
         form.word.data = ''
-        search_type = form.search_type.data
+        session['search_type'] = form.search_type.data
         form.search_type.data = ''
-        session['word'] = word
-        session['search_type'] = search_type
-        return redirect(url_for("search_results", word=word))
+        session['dict_type'] = form.dict_type.data
+        # form.dict_type.data = ''
+        return redirect(url_for("search_results", word=session['word']))
     return render_template('index.html', form=form)
 
 
 @app.route('/search-results/<word>')
 def search_results(word):
-    results = search(word, session["search_type"])
+    results = search(word, session["search_type"], session['dict_type'])
     return render_template('search-results.html',
                            word=word,
                            results=results,
@@ -45,8 +46,11 @@ def search_results(word):
 
 @app.route('/definition/<index_word>')
 def definition(index_word):
-    contents = get_contents(index_word)
-    return render_template('definition.html', word=index_word, contents=contents)
+    contents = get_contents(index_word, session['dict_type'])
+    return render_template('definition.html',
+                           word=index_word,
+                           contents=contents,
+                           dict_type=session['dict_type'])
 
 
 @app.errorhandler(404)
