@@ -23,16 +23,16 @@ class EnquiryForm(FlaskForm):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    form = EnquiryForm()
-    if form.validate_on_submit():
-        session['word'] = form.word.data
-        form.word.data = ''
-        session['search_type'] = form.search_type.data
-        form.search_type.data = ''
-        session['dict_type'] = form.dict_type.data
+    enquiry_form = EnquiryForm()
+    if enquiry_form.validate_on_submit():
+        session['word'] = enquiry_form.word.data
+        enquiry_form.word.data = ''
+        session['search_type'] = enquiry_form.search_type.data
+        enquiry_form.search_type.data = ''
+        session['dict_type'] = enquiry_form.dict_type.data
         # form.dict_type.data = ''
         return redirect(url_for("search_results", word=session['word']))
-    return render_template('index.html', form=form)
+    return render_template('index.html', enquiry_form=enquiry_form)
 
 
 @app.route('/search-results/<word>')

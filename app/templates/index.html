@@ -9,5 +9,10 @@
     このページは沖縄語辞典アプリのページです。国立国語研究所の沖縄語辞典の単語を、カタカナの見出し語で検索できます。カタカナの表記は、沖縄県が策定した『沖縄県における「しまくとぅば」の表記について』に基づいています。
 
 </div>
-{{ wtf.quick_form(form) }}
+{{ wtf.form_field(enquiry_form.word) }}
+{{ wtf.form_field(enquiry_form.submit) }}
+<h5>辞典の種類</h5>
+{{ wtf.form_field(enquiry_form.dict_type) }}
+<h5>検索方法</h5>
+{{ wtf.form_field(enquiry_form.search_type) }}
 {% endblock %}
