@@ -418,6 +418,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "wanakana-python"
+version = "1.2.2"
+description = "A port of WanaKana, a JS library by Tofugu"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "wcwidth"
 version = "0.2.5"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -464,7 +472,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "8e099e39b4d3e1bda1747958c84ff8647f8c62fd0e429583df45974f6345a31d"
+content-hash = "dcc707b7584d083ce0442ae50e6d390784027dd33d36700ff7223fea205b942b"
 
 [metadata.files]
 appnope = [
@@ -671,6 +679,9 @@ typing-extensions = [
 ]
 visitor = [
     {file = "visitor-0.1.3.tar.gz", hash = "sha256:2c737903b2b6864ebc6167eef7cf3b997126f1aa94bdf590f90f1436d23e480a"},
+]
+wanakana-python = [
+    {file = "wanakana-python-1.2.2.tar.gz", hash = "sha256:2168958ad2126eecddc3a86cfec5ba1f92eff42e85b309214513f5daaf64e08f"},
 ]
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},

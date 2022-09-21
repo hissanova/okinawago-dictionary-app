@@ -1,6 +1,8 @@
 import json
 from typing import Callable, Dict, List, Tuple
 
+from wanakana import to_hiragana, to_katakana
+
 with open("app/static/okinawa_01.json", 'r') as raw_file:
     raw_oki_dict = json.load(raw_file)
 
@@ -64,8 +66,14 @@ def search(word: str,
            dict_type: str) -> List[List[str]]:
     # print(f"In search(): dict_type={dict_type}")
     results_dict: Dict[Tuple[int, ...], List[str]] = {}
-    index_filter = _get_filter(word, search_type)
     dictionary = _get_dict(dict_type)
+    if dict_type == "oki2yamato":
+        print(word)
+        word = to_katakana(word)
+        print(word)
+    elif dict_type == "yamato2oki":
+        word = to_hiragana(word)
+    index_filter = _get_filter(word, search_type)
     # print(f"dictionary={dictionary}")
     for index_word in dictionary.index_words:
         if index_filter(index_word):

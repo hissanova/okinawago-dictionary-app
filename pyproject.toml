@@ -10,6 +10,7 @@ Flask = "^2.2.2"
 gunicorn = "^20.1.0"
 Flask-Bootstrap = "^3.3.7"
 Flask-WTF = "^1.0.1"
+wanakana-python = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.971"

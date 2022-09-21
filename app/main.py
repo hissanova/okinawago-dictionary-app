@@ -15,7 +15,7 @@ bootstrap = Bootstrap(app)
 
 
 class EnquiryForm(FlaskForm):
-    word = StringField('見出し語（カタカナ）から検索', validators=[DataRequired()])
+    word = StringField('見出し語（かな表記）から検索', validators=[DataRequired()])
     dict_type = RadioField('辞典選択', choices=[('oki2yamato', '沖→日'), ('yamato2oki', '日→沖')], default='oki2yamato')
     search_type = RadioField('検索方法', choices=[('startswith', '前方一致'), ('endswith', '後方一致')], default='startswith')
     submit = SubmitField('検索')
@@ -25,12 +25,12 @@ class EnquiryForm(FlaskForm):
 def index():
     enquiry_form = EnquiryForm()
     if enquiry_form.validate_on_submit():
-        session['word'] = enquiry_form.word.data
-        enquiry_form.word.data = ''
         session['search_type'] = enquiry_form.search_type.data
         enquiry_form.search_type.data = ''
         session['dict_type'] = enquiry_form.dict_type.data
         # form.dict_type.data = ''
+        session['word'] = enquiry_form.word.data
+        enquiry_form.word.data = ''
         return redirect(url_for("search_results", word=session['word']))
     return render_template('index.html', enquiry_form=enquiry_form)
 
