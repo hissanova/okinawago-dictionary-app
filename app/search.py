@@ -21,7 +21,6 @@ class Dictionary():
             content_dict[i] = entry
         self._key_dict = key_dict
         self._content_dict = content_dict
-        # print(self._key_dict)
 
     @property
     def index_words(self):
@@ -64,7 +63,6 @@ def _sort(word_list: List[List[str]]) -> List[List[str]]:
 def search(word: str,
            search_type: str,
            dict_type: str) -> List[List[str]]:
-    # print(f"In search(): dict_type={dict_type}")
     results_dict: Dict[Tuple[int, ...], List[str]] = {}
     dictionary = _get_dict(dict_type)
     if dict_type == "oki2yamato":
@@ -74,7 +72,6 @@ def search(word: str,
     elif dict_type == "yamato2oki":
         word = to_hiragana(word)
     index_filter = _get_filter(word, search_type)
-    # print(f"dictionary={dictionary}")
     for index_word in dictionary.index_words:
         if index_filter(index_word):
             id_keys = tuple(dictionary.get_keys(index_word))
@@ -84,7 +81,6 @@ def search(word: str,
 
 
 def get_contents(key_word: str, dict_type: str):
-    # print(f"In get_contents(): dict_type={dict_type}")
     dictionary = _get_dict(dict_type)
     keys = dictionary.get_keys(key_word)
     if not keys:
