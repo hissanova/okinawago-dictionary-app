@@ -4,21 +4,21 @@
 
 {% block page_content %}
 <div class="page-header">
-    {% if search_type == "startswith" %}
+  {% if search_type == "startswith" %}
     <h2>「{{ word }}」の検索結果(前方一致)</h2>
-    {% elif search_type == "startswith" %}
+  {% elif search_type == "startswith" %}
     <h2>「{{ word }}」の検索結果（後方一致）</h2>
-    {% endif %}
-    <hr>
-    {% if results %}
+  {% endif %}
+  <hr>
+  {% if results %}
     <p>{{ results | length }}件の検索結果が見つかりました。
-	{% for result in results %}
+      {% for result in results %}
 	<p>
-	    {{ loop.index }}. <a href="/definition/{{ result | first | urlencode }}">{{ result | join(",") }}</a>
+	  {{ loop.index }}. <a href="/definition/{{ result | first | urlencode }}">{{ result | join(",") }}</a>
 	</p>
-	{% endfor %}
+      {% endfor %}
     {% else %}
-    <p>見つかりませんでした。</p>
+      <p>見つかりませんでした。</p>
     {% endif %}
 </div>
 {% endblock %}
