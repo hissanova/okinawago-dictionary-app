@@ -66,9 +66,7 @@ def search(word: str,
     results_dict: Dict[Tuple[int, ...], List[str]] = {}
     dictionary = _get_dict(dict_type)
     if dict_type == "oki2yamato":
-        print(word)
         word = to_katakana(word)
-        print(word)
     elif dict_type == "yamato2oki":
         word = to_hiragana(word)
     index_filter = _get_filter(word, search_type)
