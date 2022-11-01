@@ -1,3 +1,6 @@
 [submodule "okinawago-dictionary"]
 	path = okinawago-dictionary
 	url = https://github.com/hissanova/okinawago-dictionary.git
+[submodule "app/okinawago_dictionary"]
+	path = app/okinawago_dictionary
+	url = https://github.com/hissanova/okinawago-dictionary.git

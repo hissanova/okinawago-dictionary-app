@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List, Tuple
 
-from app.dictionary import Dictionary, oki_dict, yamato_dict
+from app.okinawago_dictionary.scripts.dictionary import Dictionary, oki_dict, yamato_dict
 
 
 def _get_dict(dict_type: str) -> Dictionary:
