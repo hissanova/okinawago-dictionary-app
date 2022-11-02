@@ -33,12 +33,38 @@
 	  <h4>見出し語</h4> <p>{{ ",".join(content.index) }}</p>
 	  <h4>漢字</h4> <p>{{ content.kanji }}</p>
 	  <h4>説明</h4> <p>{{ content.explanation }}</p>
-	  <h4>内容</h4> <p>{{ content.meaning }}</p>
-	  <hr>
-	{% endfor %}    
-      {% endif %}
-    {% else %}
-      <p>見つかりませんでした。</p>
-    {% endif %}
+	  <h4>内容</h4>
+    <p>沖縄語：
+      <ul>
+	{% for item in content.contents.base %}
+	  {% if item['kana'] %}
+	    <li>
+	      {% if item['lang'] == 'Okinawa' %}
+		{% if item['reference'] %}c.f. {% endif %}
+		<a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
+		  {{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
+	      {% elif item['lang'] == 'Yamato' %}
+		{% if item['reference'] %}c.f. {% endif %}
+		<a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
+		  {{ item['kana'] }}</a>
+	      {% endif %}
+	    </li>
+	  {% endif %}
+	{% endfor %}
+      </ul>
+    </p>
+    <p>関連語・フレーズ：
+      <ul>
+	{% for item in content.contents.related %}
+	  <li>{{ ",".join(item) }} </li>
+	{% endfor %}
+      </ul>
+    </p>
+    <hr>
+  {% endfor %}    
+{% endif %}
+{% else %}
+  <p>見つかりませんでした。</p>
+{% endif %}
   </div>
 {% endblock %}
