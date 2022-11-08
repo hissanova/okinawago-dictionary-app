@@ -41,16 +41,17 @@ def search_results(word):
     return render_template('search-results.html',
                            word=word,
                            results=results,
-                           search_type=session['search_type'])
+                           search_type=session['search_type'],
+                           dict_type=session['dict_type'])
 
 
-@app.route('/definition/<index_word>')
-def definition(index_word):
-    contents = get_contents(index_word, session['dict_type'])
+@app.route('/definition/<dict_type>/<index_word>')
+def definition(dict_type, index_word):
+    contents = get_contents(index_word, dict_type)
     return render_template('definition.html',
                            word=index_word,
                            contents=contents,
-                           dict_type=session['dict_type'])
+                           dict_type=dict_type)
 
 
 @app.errorhandler(404)
