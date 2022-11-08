@@ -55,8 +55,30 @@
     </p>
     <p>関連語・フレーズ：
       <ul>
-	{% for item in content.contents.related %}
-	  <li>{{ ",".join(item) }} </li>
+	{% for phrases in content.contents.related %}
+	  <li>
+	    {% if phrases[0]['reference'] %}c.f.
+	      <a href="/definition/yamato2oki/{{ phrases[0]['kana'] | urlencode }}">
+		{{ phrases[0]['kana'] }}</a>
+	      {% else %}
+		{{ phrases[0]['kana'] }}
+	      {% endif %}
+	    <ul>
+	      {% for item in phrases[1:] %}
+		<li>
+		  {% if item['lang'] == 'Okinawa' %}
+		    {% if item['reference'] %}c.f. {% endif %}
+		    <a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
+		      {{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
+		  {% elif item['lang'] == 'Yamato' %}
+		    {% if item['reference'] %}c.f. {% endif %}
+		    <a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
+		      {{ item['kana'] }}</a>
+		  {% endif %}
+		</li>
+	      {% endfor %}
+	    </ul>
+	  </li>
 	{% endfor %}
       </ul>
     </p>
