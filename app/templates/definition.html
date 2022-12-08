@@ -3,14 +3,13 @@
 {% block title %}沖縄語辞典{% endblock %}
 
 {% block page_content %}
-  <div class="page-header">
-    <h2>「{{ word }}」の意味</h2>
+<div class="page-header">
     <hr>
     {% if contents %}
       {% if dict_type == "oki2yamato" %}
 	{% for content in contents %}
-	  <h4>見出し語</h4> <p>{{ ",".join(content.index) }}</p>
-	  <h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
+          <h3>{{ ",".join(content.index) }}</h3> 
+          <h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
 	  <h4>品詞</h4> <p>[{{ content.pos }}]</p>
 	  <h4>意味</h4>
 	  {% for meaning in content.meaning %}
@@ -26,13 +25,17 @@
 	  {% if content.amendment %}
 	    <p>補足:{{ content.amendment }}</p>
 	  {% endif %}
-	  <hr>
 	{% endfor %}
       {% elif  dict_type == "yamato2oki" %}
 	{% for content in contents %}    
-	  <h4>見出し語</h4> <p>{{ ",".join(content.index) }}</p>
+	  <h3>{{ ",".join(content.index) }}</h3>
 	  <h4>漢字</h4> <p>{{ content.kanji }}</p>
-	  <h4>説明</h4> <p>{{ content.explanation }}</p>
+	  <h4>補足説明</h4>
+	  {% if content.explanation %}
+	  <p>{{ content.explanation }}</p>
+	  {% else %}
+	  <p>-</p>
+	  {% endif %}
 	  <h4>内容</h4>
     <p>沖縄語：
       <ul>
@@ -82,8 +85,7 @@
 	{% endfor %}
       </ul>
     </p>
-    <hr>
-  {% endfor %}    
+  {% endfor %}
 {% endif %}
 {% else %}
   <p>見つかりませんでした。</p>

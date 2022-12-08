@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -5,7 +6,6 @@ from wtforms import StringField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 
 from app.search import search, get_contents
-
 
 app = Flask(__name__)
 
@@ -16,8 +16,14 @@ bootstrap = Bootstrap(app)
 
 class EnquiryForm(FlaskForm):
     word = StringField('見出し語（かな表記）から検索', validators=[DataRequired()])
-    dict_type = RadioField('辞典選択', choices=[('oki2yamato', '沖→日'), ('yamato2oki', '日→沖')], default='oki2yamato')
-    search_type = RadioField('検索方法', choices=[('startswith', '前方一致'), ('endswith', '後方一致')], default='startswith')
+    dict_type = RadioField('辞典選択',
+                           choices=[('oki2yamato', '沖→日'),
+                                    ('yamato2oki', '日→沖')],
+                           default='oki2yamato')
+    search_type = RadioField('検索方法',
+                             choices=[('startswith', '前方一致'),
+                                      ('endswith', '後方一致')],
+                             default='startswith')
     submit = SubmitField('検索')
 
 

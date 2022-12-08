@@ -1,0 +1,12 @@
+body {
+    font-family: "Noto Serif", "Noto Serif CJK JP";
+    font-weight:500;
+}
+
+h4 {
+    color: gray;
+}
+
+p {
+    margin-left: 15px;
+}
