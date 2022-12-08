@@ -1,6 +1,27 @@
+/* navbar */
+.navbar-default {
+    background-color: #4d201a;
+    border-color: #4d201a;
+}
+/* Title */
+.navbar-default .navbar-brand {
+    color: #c2ba47;
+    height: 50px;
+    font-size: 25px;;
+
+    /* Link */}
+.navbar-default .navbar-nav > li > a {
+    color: #c2ba47;
+    font-size: 15px;;
+}
+
 body {
     font-family: "Noto Serif", "Noto Serif CJK JP";
     font-weight:500;
+}
+
+h3 {
+    color: gray;
 }
 
 h4 {

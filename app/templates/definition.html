@@ -8,7 +8,7 @@
     {% if contents %}
       {% if dict_type == "oki2yamato" %}
 	{% for content in contents %}
-          <h3>{{ ",".join(content.index) }}</h3> 
+          <h2>{{ ",".join(content.index) }}</h2> 
           <h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
 	  <h4>品詞</h4> <p>[{{ content.pos }}]</p>
 	  <h4>意味</h4>
@@ -28,7 +28,7 @@
 	{% endfor %}
       {% elif  dict_type == "yamato2oki" %}
 	{% for content in contents %}    
-	  <h3>{{ ",".join(content.index) }}</h3>
+	  <h2>{{ ",".join(content.index) }}</h2>
 	  <h4>漢字</h4> <p>{{ content.kanji }}</p>
 	  <h4>補足説明</h4>
 	  {% if content.explanation %}
