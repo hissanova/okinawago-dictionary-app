@@ -5,12 +5,15 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h3>この辞典について</h3>
-    このページは沖縄語辞典アプリのページです。
-    <a href="https://mmsrv.ninjal.ac.jp/okinawago/" target="_blank">国立国語研究所の沖縄語辞典</a>
-    の単語を、かなの見出し語で検索できます。かなの表記は、沖縄県が策定した
-    <a href="https://www.pref.okinawa.lg.jp/site/bunka-sports/bunka/shinko/simakutuba-hyouki.html" target="_blank">『沖縄県における「しまくとぅば」の表記について』</a>
-    に基づいています。
-  </div>
-  {{wtf.quick_form(enquiry_form) }}
+    <h3>沖日辞典・日沖辞典</h3>
+    <p>
+	このページでは、国立国語研究所の沖縄語辞典の単語を、かなの見出し語で検索できます。<br>
+	かなの表記は、沖縄県が策定した
+	『沖縄県における「しまくとぅば」の表記について』
+	に基づいています。
+    </p>
+</div>
+<div class="page-body">
+    {{wtf.quick_form(enquiry_form) }}
+</div>
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}沖繩語辞典{% endblock %}
+
+{% block page_content %}
+<div class="page-body">
+    <h3>辞典について</h3>
+    <p>
+	本辞典は、
+	<a href="https://mmsrv.ninjal.ac.jp/okinawago/" target="_blank">国立国語研究所の沖縄語辞典</a>
+	の単語を、かなの見出し語で検索できるようにしたものです。<br>
+	かなの表記は、沖縄県が策定した
+	<a href="https://www.pref.okinawa.lg.jp/site/bunka-sports/bunka/shinko/simakutuba-hyouki.html" target="_blank">『沖縄県における「しまくとぅば」の表記について』</a>
+	の沖縄語の表記に基づいています。
+    </p>
+    <h5>ソースコード</h5>
+    <p>
+	<a href="https://github.com/hissanova/okinawago-dictionary-app.git">
+	https://github.com/hissanova/okinawago-dictionary-app.git
+	</a>
+    </p>
+    <h5>沖縄語辞典の電子データ</h5>
+    <p>
+	<a href="https://github.com/hissanova/okinawago_dictionary.git">
+	https://github.com/hissanova/okinawago_dictionary.git
+	</a>
+    </p>
+</div>
+{% endblock %}
