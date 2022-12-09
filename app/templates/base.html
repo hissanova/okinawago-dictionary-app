@@ -4,6 +4,9 @@
 
 {% block head %}
 {{ super() }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500&display=swap" rel="stylesheet">
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <link rel="shortcut icon" href="{{ url_for('static', filename='kanji_oki.png') }}"
       type="image/x-icon">

@@ -15,8 +15,10 @@
     font-size: 15px;;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500&display=swap');
+
 body {
-    font-family: "Noto Serif", "Noto Serif CJK JP";
+    font-family: "Noto Serif", "Noto Serif JP", serif;
     font-weight:500;
 }
 
@@ -30,4 +32,9 @@ h4 {
 
 p {
     margin-left: 15px;
+}
+
+hr { border: none;
+     border-top: 1px solid #98a820;
+     margin-top: 35px;
 }
