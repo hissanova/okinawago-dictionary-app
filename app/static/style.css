@@ -1,18 +1,43 @@
+:root {
+    --wine-red: #4d201a;
+    --gold: #c2ba47;
+    --moegi: #98a820;
+    --silver: gray;
+    --seiheki: #488484;
+}
+
 /* navbar */
 .navbar-default {
-    background-color: #4d201a;
-    border-color: #4d201a;
+    background-color: var(--wine-red);
+    border-color: var(--wine-red);
 }
 /* Title */
 .navbar-default .navbar-brand {
-    color: #c2ba47;
+    color: var(--gold);
     height: 50px;
-    font-size: 25px;;
-
-    /* Link */}
+    font-size: 25px;
+}
+/* Link */
 .navbar-default .navbar-nav > li > a {
-    color: #c2ba47;
+    color: var(--gold);
+    font-size: 15px;
+}
+.navbar-default .navbar-brand:hover {
+    color: var(--silver);
+    height: 50px;
+    font-size: 25px;
+}
+
+/* Link */
+.navbar-default .navbar-nav > li > a:hover {
+    color: var(--silver);
     font-size: 15px;;
+}
+
+.page-header {
+    padding-bottom: 5px;
+    margin: 20px 0 20px;
+    border-bottom: None;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500&display=swap');
@@ -23,18 +48,26 @@ body {
 }
 
 h3 {
-    color: gray;
+    color: var(--silver);
 }
 
 h4 {
-    color: gray;
+    color: var(--silver);
 }
 
 p {
     margin-left: 15px;
 }
 
+a {
+    color: var(--seiheki)
+}
+
 hr { border: none;
-     border-top: 1px solid #98a820;
+     border-top: 1px solid var(--moegi);
      margin-top: 35px;
+}
+
+input {
+    accent-color: var(--seiheki);
 }
