@@ -3,11 +3,11 @@
 {% block title %}沖縄語辞典{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <hr>
+<div class="page-body">
     {% if contents %}
       {% if dict_type == "oki2yamato" %}
 	{% for content in contents %}
+	  <hr>
           <h2>{{ ",".join(content.index) }}</h2> 
           <h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
 	  <h4>品詞</h4> <p>[{{ content.pos }}]</p>
@@ -15,7 +15,6 @@
 	  {% for meaning in content.meaning %}
 	    <p>{{ meaning }}</p>
 	  {% endfor %}
-	  <h4>備考・補足</h4>
 	  {% if content['bungo-type'] %}
 	    <p>文語の型:{{content['bungo-type'] }}</p>
 	  {% endif %}
@@ -26,66 +25,67 @@
 	    <p>補足:{{ content.amendment }}</p>
 	  {% endif %}
 	{% endfor %}
+	<hr>
       {% elif  dict_type == "yamato2oki" %}
-	{% for content in contents %}    
+	{% for content in contents %}
+	  <hr>
 	  <h2>{{ ",".join(content.index) }}</h2>
 	  <h4>漢字</h4> <p>{{ content.kanji }}</p>
-	  <h4>補足説明</h4>
 	  {% if content.explanation %}
-	  <p>{{ content.explanation }}</p>
-	  {% else %}
-	  <p>-</p>
+	    <h4>補足説明</h4>
+            <p>{{ content.explanation }}</p>
 	  {% endif %}
 	  <h4>内容</h4>
-    <p>沖縄語：
-      <ul>
-	{% for item in content.contents.base %}
-	  {% if item['kana'] %}
-	    <li>
-	      {% if item['lang'] == 'Okinawa' %}
-		{% if item['reference'] %}c.f. {% endif %}
-		<a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
-		  {{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
-	      {% elif item['lang'] == 'Yamato' %}
-		{% if item['reference'] %}c.f. {% endif %}
-		<a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
-		  {{ item['kana'] }}</a>
-	      {% endif %}
-	    </li>
-	  {% endif %}
-	{% endfor %}
-      </ul>
-    </p>
-    <p>関連語・フレーズ：
-      <ul>
-	{% for phrases in content.contents.related %}
-	  <li>
-	    {% if phrases[0]['reference'] %}c.f.
-	      <a href="/definition/yamato2oki/{{ phrases[0]['kana'] | urlencode }}">
-		{{ phrases[0]['kana'] }}</a>
-	      {% else %}
+          <p>沖縄語：
+	    <ul>
+	      {% for item in content.contents.base %}
+		{% if item['kana'] %}
+		  <li>
+		    {% if item['lang'] == 'Okinawa' %}
+		      {% if item['reference'] %}c.f. {% endif %}
+		      <a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
+			{{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
+		      {% elif item['lang'] == 'Yamato' %}
+			{% if item['reference'] %}c.f. {% endif %}
+			<a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
+			  {{ item['kana'] }}</a>
+	            {% endif %}
+		  </li>
+		{% endif %}
+	      {% endfor %}
+	    </ul>
+	  </p>
+          <p>関連語・フレーズ：
+	    <ul>
+	      {% for phrases in content.contents.related %}
+		<li>
+		  {% if phrases[0]['reference'] %}c.f.
+		    <a href="/definition/yamato2oki/{{ phrases[0]['kana'] | urlencode }}">
+		      {{ phrases[0]['kana'] }}</a>
+		    {% else %}
 		{{ phrases[0]['kana'] }}
 	      {% endif %}
-	    <ul>
-	      {% for item in phrases[1:] %}
-		<li>
-		  {% if item['lang'] == 'Okinawa' %}
-		    {% if item['reference'] %}c.f. {% endif %}
-		    <a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
-		      {{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
-		  {% elif item['lang'] == 'Yamato' %}
-		    {% if item['reference'] %}c.f. {% endif %}
-		    <a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
-		      {{ item['kana'] }}</a>
-		  {% endif %}
+	      <ul>
+		{% for item in phrases[1:] %}
+		  <li>
+		    {% if item['lang'] == 'Okinawa' %}
+		      {% if item['reference'] %}c.f. {% endif %}
+		      <a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
+			{{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
+		      {% elif item['lang'] == 'Yamato' %}
+			{% if item['reference'] %}c.f. {% endif %}
+			<a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
+			  {{ item['kana'] }}</a>
+			{% endif %}
+		  </li>
+		{% endfor %}
+	      </ul>
 		</li>
 	      {% endfor %}
 	    </ul>
-	  </li>
+          </p>
 	{% endfor %}
-      </ul>
-    </p>
-  {% endfor %}
+	<hr>
 {% endif %}
 {% else %}
   <p>見つかりませんでした。</p>
