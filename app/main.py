@@ -60,6 +60,11 @@ def definition(dict_type, index_word):
                            dict_type=dict_type)
 
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
