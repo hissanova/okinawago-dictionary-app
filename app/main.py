@@ -54,7 +54,7 @@ def search_results(word):
 @app.route('/definition/<dict_type>/<index_word>')
 def definition(dict_type, index_word):
     contents = get_contents(index_word, dict_type)
-    return render_template('definition.html',
+    return render_template(f'definition-{dict_type}.html',
                            word=index_word,
                            contents=contents,
                            dict_type=dict_type)

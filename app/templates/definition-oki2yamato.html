@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}沖縄語辞典{% endblock %}
+
+{% block page_content %}
+  <div class="page-body">
+    {% if contents %}
+      {% for content in contents %}
+	<hr>
+	<h2>{{ ",".join(content.index) }}</h2> 
+	<h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
+	<h4>品詞</h4> <p>[{{ content.pos }}]</p>
+	<h4>意味</h4>
+	{% for meaning in content.meaning %}
+	  <p>{{ meaning }}</p>
+	{% endfor %}
+	{% if content['bungo-type'] %}
+	  <p>文語の型:{{content['bungo-type'] }}</p>
+	{% endif %}
+	{% if content.remarks %}
+	  <p>備考:{{ content.remarks }}</p>
+	{% endif %}
+	{% if content.amendment %}
+	  <p>補足:{{ content.amendment }}</p>
+	{% endif %}
+      {% endfor %}
+      <hr>
+    {% else %}
+      <p>見つかりませんでした。</p>
+    {% endif %}
+  </div>
+{% endblock %}
