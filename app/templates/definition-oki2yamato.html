@@ -9,7 +9,32 @@
 	<hr>
 	<h2>{{ ",".join(content.index) }}</h2> 
 	<h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
-	<h4>品詞</h4> <p>[{{ content.pos }}]</p>
+	<h4>品詞</h4>
+	<p>[{{ content.pos.type }}]</p>
+	{% if content.pos.conjugation %}
+	<h5>活用</h5>
+	<p>
+	    <table>
+		<thead>
+		    <tr>
+			<th colspan="4">活用</th>
+		    </tr>
+		</thead>		
+		<tr>
+		    <th>語幹</th>
+		    <th>活用形</th>
+		    <th>発音</th>
+		    <th>かな表記</th>
+		</tr>
+		<tr>
+		    <td>基本語幹 /{{ content.pos.conjugation.stems.基本 }}/</td>
+		    <td>否定形</td>
+		    <td>/{{ content.pos.conjugation.基本派生形.否定形.pronunciation }}/</td>
+		    <td>{{ content.pos.conjugation.基本派生形.否定形.kana }}</td>
+		</tr>
+	    </table>
+	</p>
+	{% endif %}
 	<h4>意味</h4>
 	{% for meaning in content.meaning %}
 	  <p>{{ meaning }}</p>

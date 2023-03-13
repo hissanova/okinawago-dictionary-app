@@ -71,3 +71,7 @@ hr { border: none;
 input {
     accent-color: var(--seiheki);
 }
+
+table, th, td {
+  border: 1.5px solid var(--silver);
+}
