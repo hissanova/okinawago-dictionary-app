@@ -73,5 +73,6 @@ input {
 }
 
 table, th, td {
-  border: 1.5px solid var(--silver);
+    padding: 5px;
+    border: 1.5px solid var(--silver);
 }
