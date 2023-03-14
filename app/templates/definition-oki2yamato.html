@@ -9,11 +9,48 @@
 	<hr>
 	<h2>{{ ",".join(content.index) }}</h2> 
 	<h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
-	<h4>品詞</h4> <p>[{{ content.pos }}]</p>
+	<h4>品詞</h4>
+	<p>[{{ content.pos.type }}]</p>
 	<h4>意味</h4>
 	{% for meaning in content.meaning %}
-	  <p>{{ meaning }}</p>
+	<p>{{ meaning }}</p>
 	{% endfor %}
+	{% if content.pos.conjugation %}
+	<h4>活用</h4>
+	<p>
+	    <table>
+		<thead>
+		    <tr>
+			<th>語幹</th>
+			<th colspan="2">活用</th>
+		    </tr>
+		</thead>		
+		<tr>
+		    <td> 基本語幹 /{{ content.pos.conjugation.stems.基本 }}-/ </td>
+		    <td> 否定形 </td>
+		    <td> {{ content.pos.conjugation.基本派生形.否定形.kana }} /{{ content.pos.conjugation.基本派生形.否定形.pronunciation }}/ </td>
+		</tr>
+		<tr>
+		    <td> 連用語幹 /{{ content.pos.conjugation.stems.連用 }}-/ </td>
+		    <td> 連用形 </td>
+		    <td> {{ content.pos.conjugation.連用派生形.連用形.kana }} /{{ content.pos.conjugation.連用派生形.連用形.pronunciation }}/ </td>
+		</tr>
+		<tr>
+		    <td rowspan="3"> 音便語幹 /{{ content.pos.conjugation.stems.音便 }}-/ </td>
+		    <td> 過去形 </td>
+		    <td> {{ content.pos.conjugation.音便派生形.過去形.kana }} /{{ content.pos.conjugation.音便派生形.過去形.pronunciation }}/ </td>
+		</tr>
+		<tr>
+		    <td> てぃ形 </td>
+		    <td> {{ content.pos.conjugation.音便派生形.て形.kana }} /{{ content.pos.conjugation.音便派生形.て形.pronunciation }}/ </td>
+		</tr>
+		<tr>
+		    <td> 継続形 </td>
+		    <td> {{ content.pos.conjugation.音便派生形.継続形.kana }} /{{ content.pos.conjugation.音便派生形.継続形.pronunciation }}/ </td>
+		</tr>
+	    </table>
+	</p>
+	{% endif %}
 	{% if content['bungo-type'] %}
 	  <p>文語の型:{{content['bungo-type'] }}</p>
 	{% endif %}
