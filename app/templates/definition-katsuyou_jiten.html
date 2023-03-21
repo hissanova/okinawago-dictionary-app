@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}沖縄語辞典{% endblock %}
+
+{% block page_content %}
+  <div class="page-body">
+    {% if contents %}
+      {% for content in contents %}
+      <hr>
+	<h2>{{ ",".join(content.index) }}</h2> 
+	<h4>品詞</h4>
+	<p>[{{ content.pos }}]</p>
+	<h4>意味</h4>
+	{{ content.yamato }}
+	{% if content.conjugation %}
+	<h4>活用</h4>
+	<p>{{ content.conjugation }}</p>
+	{% endif %}
+	{% if content.sample_setences %}
+	<h4>例文</h4>
+	<p>{{ content.sample_setences }}</p>
+	{% endif %}
+	{% if content.reference %}
+	<h4>参考</h4>
+	<p>{{ content.reference }}</p>
+	{% endif %}
+      {% endfor %}
+      <hr>
+    {% else %}
+      <p>見つかりませんでした。</p>
+    {% endif %}
+  </div>
+{% endblock %}

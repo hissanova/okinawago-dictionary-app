@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, RadioField
+from wtforms import BooleanField, StringField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 
 from app.search import search, get_contents
@@ -20,6 +20,7 @@ class EnquiryForm(FlaskForm):
                            choices=[('oki2yamato', '沖→日'),
                                     ('yamato2oki', '日→沖')],
                            default='oki2yamato')
+    use_katsuyou_jiten = BooleanField('うちなーぐち活用辞典の結果を含む')
     search_type = RadioField('検索方法',
                              choices=[('startswith', '前方一致'),
                                       ('endswith', '後方一致')],
@@ -34,6 +35,7 @@ def index():
         session['search_type'] = enquiry_form.search_type.data
         enquiry_form.search_type.data = ''
         session['dict_type'] = enquiry_form.dict_type.data
+        session['use_katsuyou_jiten'] = enquiry_form.use_katsuyou_jiten.data
         # form.dict_type.data = ''
         session['word'] = enquiry_form.word.data
         enquiry_form.word.data = ''
@@ -43,7 +45,12 @@ def index():
 
 @app.route('/search-results/<word>')
 def search_results(word):
-    results = search(word, session["search_type"], session['dict_type'])
+    results = search(
+        word,
+        session["search_type"],
+        session['dict_type'],
+        session['use_katsuyou_jiten'],
+    )
     return render_template('search-results.html',
                            word=word,
                            results=results,
@@ -54,6 +61,7 @@ def search_results(word):
 @app.route('/definition/<dict_type>/<index_word>')
 def definition(dict_type, index_word):
     contents = get_contents(index_word, dict_type)
+    print(contents)
     return render_template(f'definition-{dict_type}.html',
                            word=index_word,
                            contents=contents,
