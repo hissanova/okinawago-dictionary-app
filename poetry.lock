@@ -685,7 +685,7 @@ mypy-extensions = [
     {file = "mypy_extensions-1.0.0.tar.gz", hash = "sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"},
 ]
 okinawago-dictionary = [
-    {file = "okinawago_dictionary-0.3.0-py3-none-any.whl", hash = "sha256:78c6ba7031c426e38eed93fb73e72502e380860be23957d3e508c07e2057bf90"},
+    {file = "okinawago_dictionary-0.3.0-py3-none-any.whl", hash = "sha256:67ff56e5c08b6023b2965d8d66d14dee312405cbcbddcb727045a21b8bb94e7f"},
 ]
 openpyxl = [
     {file = "openpyxl-3.1.2-py2.py3-none-any.whl", hash = "sha256:f91456ead12ab3c6c2e9491cf33ba6d08357d802192379bb482f1033ade496f5"},

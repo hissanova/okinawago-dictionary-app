@@ -14,15 +14,46 @@
 	{{ content.yamato }}
 	{% if content.conjugation %}
 	<h4>活用</h4>
-	<p>{{ content.conjugation }}</p>
+	<p>
+	    <table>
+		<thead>
+		    <tr>
+			<th>過去形</th>
+			<th>否定形</th>
+			<th>てぃ形</th>
+		    </tr>
+		</thead>		
+		<tr>
+		    <td> {{ content.conjugation.過去形 }}  </td>
+		    <td> {{ content.conjugation.否定形 }} </td>
+		    <td> {{ content.conjugation.てぃ形 }} </td>
+		</tr>
+	    </table>
+	</p>
 	{% endif %}
-	{% if content.sample_setences %}
+	{% if content.sample_sentences %}
 	<h4>例文</h4>
-	<p>{{ content.sample_setences }}</p>
+	<p>
+	    <ul>
+	    {% for sentence in content.sample_sentences %}
+		<li>{{ sentence.okinawa }}
+		    <ul>
+			<li>{{ sentence.yamato }}</li>
+		    </ul>
+		</li>
+	    {% endfor %}
+	    </ul>
+	</p>
 	{% endif %}
-	{% if content.reference %}
+	{% if content.related %}
 	<h4>参考</h4>
-	<p>{{ content.reference }}</p>
+	<p>
+	    <ul>
+	    {% for item in content.related %}
+		<li><a href="/definition/katsuyou_jiten/{{ item.index | first | urlencode }}"> {{ ",".join(item.index) }} {{ item.yamato }}</a></li>
+	    {% endfor %}
+	    </ul>
+	</p>
 	{% endif %}
       {% endfor %}
       <hr>

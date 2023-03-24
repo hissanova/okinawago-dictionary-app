@@ -35,10 +35,11 @@ class Match(NamedTuple):
 
 
 def _sort(word_list: List[Match]) -> List[Match]:
-    return sorted(word_list, key=lambda m: m.matched_words[0])
+    return sorted(word_list,
+                  key=lambda m: oki_dict.normalise_kana(m.matched_words[0]))
 
 
-display_str = {'oki2yamato': '沖日', 'yamato2oki': '日沖', 'katsuyou_jiten': 'うち活'}
+display_str = {'oki2yamato': '沖', 'yamato2oki': '日', 'katsuyou_jiten': 'う'}
 
 
 def get_results(dict_type, dictionary, match_filter):
@@ -57,22 +58,21 @@ def get_results(dict_type, dictionary, match_filter):
 def search(
     query_word: str,
     search_type: str,
-    dict_type: str,
-    use_katsuyou_jiten: bool,
+    dict_types: List[str],
 ) -> List[Match]:
-    dictionary = _get_dict(dict_type)
-    match_filter = _get_filter(dictionary.normalise_kana(query_word),
-                               search_type)
-    matched_results = get_results(dict_type, dictionary, match_filter)
-    print(matched_results[:5])
-    if use_katsuyou_jiten:
-        matched_results += get_results('katsuyou_jiten', katsuyou_jiten,
-                                       match_filter)
+    matched_results = []
+    for dict_type in dict_types:
+        dictionary = _get_dict(dict_type)
+        match_filter = _get_filter(dictionary.normalise_kana(query_word),
+                                   search_type)
+        matched_results += get_results(dict_type, dictionary, match_filter)
     return _sort(matched_results)
 
 
 def get_contents(key_word: str, dict_type: str):
     dictionary = _get_dict(dict_type)
+    key_word = key_word.replace("\u2003", "").replace(" ", "")
+    key_word = dictionary.normalise_kana(key_word)
     keys = dictionary.get_keys(key_word)
     if not keys:
         return []
