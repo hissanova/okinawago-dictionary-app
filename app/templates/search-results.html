@@ -8,13 +8,14 @@
     <h2>「{{ word }}」の検索結果(前方一致)</h2>
   {% elif search_type == "startswith" %}
     <h2>「{{ word }}」の検索結果（後方一致）</h2>
-  {% endif %}
-  <hr>
-  {% if results %}
-    <p>{{ results | length }}件の検索結果が見つかりました。
+    {% endif %}
+    <p>[沖]: 沖→日、[う]: うちなーぐち活用辞典、[日]: 日→沖</p>
+    <hr>
+    {% if results %}
+    <h5>{{ results | length }}件の検索結果が見つかりました。</h5>
       {% for result in results %}
 	<p>
-	  {{ loop.index }}. <a href="/definition/{{ dict_type }}/{{ result | first | urlencode }}">{{ result | join(",") }}</a>
+	  {{ loop.index }}. <a href="/definition/{{ result.dict_type }}/{{ result.matched_words | first | urlencode }}">[{{ result.display_str }}] {{ result.matched_words | join(",") }}</a>
 	</p>
       {% endfor %}
     {% else %}

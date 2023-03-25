@@ -5,15 +5,29 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h3>沖日辞典・日沖辞典</h3>
+    <h3>沖日辞典・日沖辞典・うちなーぐち活用辞典</h3>
     <p>
-	このページでは、国立国語研究所の沖縄語辞典の単語を、かなの見出し語で検索できます。<br>
+	このページでは、国立国語研究所の『沖縄語辞典』と『うちなーぐち活用辞典』内の単語を、かなの見出し語で検索できます。<br>
 	かなの表記は、沖縄県が策定した
 	『沖縄県における「しまくとぅば」の表記について』
 	に基づいています。
     </p>
 </div>
-<div class="page-body">
-    {{wtf.quick_form(enquiry_form) }}
+<div class="page-body">    
+	<form method="POST">
+	    <div class="form-group">
+		{{ enquiry_form.word.label }}<br>
+		{{ enquiry_form.word }}
+	    </div>
+	    <div class="form-group">
+		{{ enquiry_form.dict_type.label }}
+		{{ enquiry_form.dict_type }}
+	    </div>
+	    <div class="form-group">
+		{{ enquiry_form.search_type.label }}
+		{{ enquiry_form.search_type }}
+	    </div>
+		{{ enquiry_form.submit }}		
+	</form>
 </div>
 {% endblock %}

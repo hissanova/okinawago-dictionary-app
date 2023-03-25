@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, RadioField
+from wtforms import widgets, StringField, SubmitField, RadioField, SelectMultipleField
 from wtforms.validators import DataRequired
 
 from app.search import search, get_contents
@@ -14,13 +14,30 @@ app.config['SECRET_KEY'] = 'Haisai. Chu-uganbira.'
 bootstrap = Bootstrap(app)
 
 
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+
+
+dict_list = [
+    ('oki2yamato', '沖→日'),
+    ('katsuyou_jiten', 'うちなーぐち活用辞典'),
+    ('yamato2oki', '日→沖'),
+]
+
+
 class EnquiryForm(FlaskForm):
-    word = StringField('見出し語（かな表記）から検索', validators=[DataRequired()])
-    dict_type = RadioField('辞典選択',
-                           choices=[('oki2yamato', '沖→日'),
-                                    ('yamato2oki', '日→沖')],
-                           default='oki2yamato')
-    search_type = RadioField('検索方法',
+    word = StringField('検索語の入力（かな表記）',
+                       validators=[DataRequired()],
+                       render_kw={
+                           "placeholder": "検索語を入力して下さい",
+                           "style": "width:100%"
+                       })
+    dict_type = MultiCheckboxField(
+        '検索する辞書の選択',
+        choices=dict_list,
+        default=[dict_label[0] for dict_label in dict_list])
+    search_type = RadioField('検索語と見出し語の一致方法の選択',
                              choices=[('startswith', '前方一致'),
                                       ('endswith', '後方一致')],
                              default='startswith')
@@ -30,11 +47,10 @@ class EnquiryForm(FlaskForm):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     enquiry_form = EnquiryForm()
-    if enquiry_form.validate_on_submit():
+    if enquiry_form.is_submitted():
         session['search_type'] = enquiry_form.search_type.data
         enquiry_form.search_type.data = ''
         session['dict_type'] = enquiry_form.dict_type.data
-        # form.dict_type.data = ''
         session['word'] = enquiry_form.word.data
         enquiry_form.word.data = ''
         return redirect(url_for("search_results", word=session['word']))
@@ -43,7 +59,11 @@ def index():
 
 @app.route('/search-results/<word>')
 def search_results(word):
-    results = search(word, session["search_type"], session['dict_type'])
+    results = search(
+        word,
+        session["search_type"],
+        session['dict_type'],
+    )
     return render_template('search-results.html',
                            word=word,
                            results=results,

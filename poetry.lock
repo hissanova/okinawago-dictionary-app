@@ -284,7 +284,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "okinawago-dictionary"
-version = "0.2.0"
+version = "0.3.0"
 description = ""
 category = "main"
 optional = false
@@ -297,7 +297,7 @@ wanakana-python = ">=1.2.2,<2.0.0"
 
 [package.source]
 type = "file"
-url = "extra_wheels/okinawago_dictionary-0.2.0-py3-none-any.whl"
+url = "extra_wheels/okinawago_dictionary-0.3.0-py3-none-any.whl"
 
 [[package]]
 name = "openpyxl"
@@ -521,7 +521,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "262772aa18e066a7e0bbcb1930828f32570980d5816a357f7dd6c4fbe1151ab1"
+content-hash = "07021f72394c1fce4c864f9e93bafd0b079b60acd31a44833d18d8b97f233273"
 
 [metadata.files]
 appnope = [
@@ -685,7 +685,7 @@ mypy-extensions = [
     {file = "mypy_extensions-1.0.0.tar.gz", hash = "sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"},
 ]
 okinawago-dictionary = [
-    {file = "okinawago_dictionary-0.2.0-py3-none-any.whl", hash = "sha256:bf63216581f46ad18c8ff1734315daf1aa61e5b4947965fdd9f75d883f1028aa"},
+    {file = "okinawago_dictionary-0.3.0-py3-none-any.whl", hash = "sha256:67ff56e5c08b6023b2965d8d66d14dee312405cbcbddcb727045a21b8bb94e7f"},
 ]
 openpyxl = [
     {file = "openpyxl-3.1.2-py2.py3-none-any.whl", hash = "sha256:f91456ead12ab3c6c2e9491cf33ba6d08357d802192379bb482f1033ade496f5"},
