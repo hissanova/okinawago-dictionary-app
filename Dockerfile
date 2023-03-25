@@ -12,7 +12,7 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Install production dependencies.
-RUN pip install --no-cache-dir -r requirements.txt ./extra_wheels/okinawago_dictionary-0.2.0-py3-none-any.whl
+RUN pip install --no-cache-dir -r requirements.txt ./extra_wheels/okinawago_dictionary-0.3.0-py3-none-any.whl
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.
