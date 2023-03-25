@@ -71,8 +71,12 @@ hr { border: none;
 input {
     accent-color: var(--seiheki);
 }
+label {
+    font-weight: normal;
+}
 
 table, th, td {
     padding: 5px;
     border: 1.5px solid var(--silver);
 }
+

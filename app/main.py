@@ -27,12 +27,17 @@ dict_list = [
 
 
 class EnquiryForm(FlaskForm):
-    word = StringField('検索語の入力（かな表記）', validators=[DataRequired()])
+    word = StringField('検索語の入力（かな表記）',
+                       validators=[DataRequired()],
+                       render_kw={
+                           "placeholder": "検索語を入力して下さい",
+                           "style": "width:100%"
+                       })
     dict_type = MultiCheckboxField(
-        '辞書選択',
+        '検索する辞書の選択',
         choices=dict_list,
         default=[dict_label[0] for dict_label in dict_list])
-    search_type = RadioField('検索方法',
+    search_type = RadioField('検索語と見出し語の一致方法の選択',
                              choices=[('startswith', '前方一致'),
                                       ('endswith', '後方一致')],
                              default='startswith')
