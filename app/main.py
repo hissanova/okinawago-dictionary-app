@@ -25,6 +25,12 @@ dict_list = [
     ('yamato2oki', '日→沖'),
 ]
 
+search_types = [
+    ('contains', '検索語を含む'),
+    ('startswith', '前方一致'),
+    ('endswith', '後方一致'),
+]
+
 
 class EnquiryForm(FlaskForm):
     word = StringField('検索語の入力（かな表記）',
@@ -37,10 +43,9 @@ class EnquiryForm(FlaskForm):
         '検索する辞書の選択',
         choices=dict_list,
         default=[dict_label[0] for dict_label in dict_list])
-    search_type = RadioField('検索語と見出し語の一致方法の選択',
-                             choices=[('startswith', '前方一致'),
-                                      ('endswith', '後方一致')],
-                             default='startswith')
+    search_type = RadioField('検索語と見出し語の一致条件の選択',
+                             choices=search_types,
+                             default='contains')
     submit = SubmitField('検索')
 
 
