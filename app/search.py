@@ -1,7 +1,7 @@
 from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 import re
 
-from wanakana import is_hiragana, to_hiragana
+from wanakana import to_hiragana
 
 from okinawago_dictionary.dictionary import Dictionary, oki_dict, yamato_dict, katsuyou_jiten
 
@@ -46,24 +46,17 @@ def _get_filter(word: str, search_type: str) -> Filter:
     return filter_
 
 
-def _emphasize(word: str, str_to_emph: str) -> str:
-    print(word, str_to_emph)
-    if is_hiragana(word):
+def _emphasize_match(match: Match, str_to_emph: str) -> Match:
+    if match.dict_type == "yamato2oki":
         str_to_emph = to_hiragana(str_to_emph)
-    index = word.index(str_to_emph)
-    return word[:index] + "<b>" + str_to_emph + "</b>" + word[
-        index + len(str_to_emph):]
-
-
-def emphasize_match(match: Match, str_to_emph: str):
-
+    pattern = re.compile(r"(" + str_to_emph + r")")
     return Match(
         match.dict_type, match.dict_type_for_display, match.matched_ids,
         match.matched_words,
-        [_emphasize(word, str_to_emph) for word in match.matched_words])
+        [pattern.sub(r"<b>\1</b>", word) for word in match.matched_words])
 
 
-def get_sorter(search_type: str, word: str, normaliser) -> Sorter:
+def _get_sorter(search_type: str, word: str, normaliser) -> Sorter:
     if search_type == 'contains':
 
         def _key_func(match: Match):
@@ -89,7 +82,11 @@ def get_sorter(search_type: str, word: str, normaliser) -> Sorter:
 dict_types = {'oki2yamato': '沖', 'yamato2oki': '日', 'katsuyou_jiten': 'う'}
 
 
-def get_results(dict_type, dictionary, match_filter):
+def get_results(
+    dict_type: str,
+    dictionary: Dictionary,
+    match_filter: Filter,
+) -> List[Match]:
     matched_words: Dict[Tuple[int, ...], List[str]] = {}
     for candidate_word in dictionary.index_words:
         if match_filter(candidate_word):
@@ -108,15 +105,15 @@ def search(
     dict_types: List[str],
 ) -> List[Match]:
     matched_results = []
-    sort_func = get_sorter(search_type, oki_dict.normalise_kana(query_word),
-                           oki_dict.normalise_kana)
+    sort_func = _get_sorter(search_type, oki_dict.normalise_kana(query_word),
+                            oki_dict.normalise_kana)
     for dict_type in dict_types:
         dictionary = _get_dict(dict_type)
         match_filter = _get_filter(dictionary.normalise_kana(query_word),
                                    search_type)
         matched_results += get_results(dict_type, dictionary, match_filter)
     return [
-        emphasize_match(match, oki_dict.normalise_kana(query_word))
+        _emphasize_match(match, oki_dict.normalise_kana(query_word))
         for match in sort_func(matched_results)
     ]
 
