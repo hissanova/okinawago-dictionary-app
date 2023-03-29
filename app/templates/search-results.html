@@ -4,18 +4,20 @@
 
 {% block page_content %}
 <div class="page-header">
-  {% if search_type == "startswith" %}
+  {% if search_type == "contains" %}
+    <h2>「{{ word }}」の検索結果(「{{ word }}」を含む語)</h2>
+  {% elif search_type == "startswith" %}
     <h2>「{{ word }}」の検索結果(前方一致)</h2>
   {% elif search_type == "startswith" %}
     <h2>「{{ word }}」の検索結果（後方一致）</h2>
-    {% endif %}
+  {% endif %}
     <p>[沖]: 沖→日、[う]: うちなーぐち活用辞典、[日]: 日→沖</p>
     <hr>
     {% if results %}
     <h5>{{ results | length }}件の検索結果が見つかりました。</h5>
       {% for result in results %}
 	<p>
-	  {{ loop.index }}. <a href="/definition/{{ result.dict_type }}/{{ result.matched_words | first | urlencode }}">[{{ result.display_str }}] {{ result.matched_words | join(",") }}</a>
+	  {{ loop.index }}. <a href="/definition/{{ result.dict_type }}/{{ result.matched_words | first | urlencode }}">[{{ result.dict_type_for_display }}] {{ result.matched_words_for_display | join(",") | safe }}</a>
 	</p>
       {% endfor %}
     {% else %}
