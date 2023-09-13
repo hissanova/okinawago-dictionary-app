@@ -58,6 +58,9 @@ h4 {
 p {
     margin-left: 15px;
 }
+p.okinawago {
+    margin-left: 30px;
+}
 
 a {
     color: var(--seiheki)
@@ -76,7 +79,15 @@ label {
 }
 
 table, th, td {
+    margin-left: 15px;
     padding: 5px;
-    border: 1.5px solid var(--silver);
+    border: 1.7px solid var(--silver);
 }
 
+table.tg {
+}
+
+th.tg-0lax {
+    font-weight: 550;
+    background-color: #eeeeee;
+}

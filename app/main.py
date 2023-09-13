@@ -85,6 +85,11 @@ def definition(dict_type, index_word):
                            dict_type=dict_type)
 
 
+@app.route('/pronunciation')
+def pronunciation():
+    return render_template('pronunciation.html')
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
