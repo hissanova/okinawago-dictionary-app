@@ -1,4 +1,5 @@
 import os
+from typing import List, Tuple
 from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -103,6 +104,49 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html'), 500
+
+
+@app.template_filter()
+def multi_replace(yamato_paragraph: str, oki_list: List) -> str:
+    for phonetics in oki_list:
+        target_oki = phonetics["phonemes"]["simplified"]
+        pronunciation = phonetics["pronunciation"]
+        heimin_kana = pronunciation["HEIMIN"]['kana'][0]
+        heimin_ipa = pronunciation["HEIMIN"]['IPA']
+        replacement = "<i>" + heimin_kana + "</i>" + "〔" + heimin_ipa + "〕"
+        if shizoku_pro := pronunciation.get("SHIZOKU"):
+            shizoku_kana = shizoku_pro["kana"][0]
+            shizoku_ipa = shizoku_pro["IPA"]
+            replacement += "(士:<i>" + shizoku_kana + "</i>" + "〔" + shizoku_ipa + "〕)"
+        yamato_paragraph = yamato_paragraph.replace(target_oki, replacement)
+    return yamato_paragraph
+
+
+@app.template_filter()
+def render_phonetics_list_phonemes(phonetics_list):
+    return ",".join([e["phonemes"]["original"] for e in phonetics_list])
+
+
+@app.template_filter()
+def render_phonetics_list_kana(phonetics_list):
+    for phonetics in phonetics_list:
+        pronunciation = phonetics["pronunciation"]
+        kana = pronunciation["HEIMIN"]['kana'][0]
+        if shizoku_pro := pronunciation.get("SHIZOKU"):
+            shizoku_kana = shizoku_pro["kana"][0]
+            kana += " (士:" + shizoku_kana + ")"
+    return kana
+
+
+@app.template_filter()
+def render_phonetics_list_IPA(phonetics_list):
+    for phonetics in phonetics_list:
+        pronunciation = phonetics["pronunciation"]
+        ipa = "〔" + pronunciation["HEIMIN"]['IPA'] + "〕"
+        if shizoku_pro := pronunciation.get("SHIZOKU"):
+            shizoku_ipa = shizoku_pro["IPA"]
+            ipa += " (士:〔" + shizoku_ipa + "〕)"
+    return ipa
 
 
 if __name__ == "__main__":

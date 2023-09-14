@@ -49,10 +49,12 @@
 <tbody>
   <tr>
     <th class="tg-0lax">音素</th>
-    <td class="tg-0lax">{{ phonetics_obj.phonemes.original}}
-    {% if phonetics_obj.phonemes.original != phonetics_obj.phonemes.simplified %}
-      ,{{ phonetics_obj.phonemes.simplified}}
-    {% endif %}
+    <td class="tg-0lax">
+	/{{ phonetics_obj.phonemes.original | safe }}
+	{% if phonetics_obj.phonemes.original != phonetics_obj.phonemes.simplified %}
+	,{{ phonetics_obj.phonemes.simplified}}
+	{% endif %}
+	/
     </td>
   </tr>
   <tr>
@@ -67,10 +69,10 @@
   <tr>
     <th class="tg-0lax">IPA</th>
     <td class="tg-0lax">
-    {{phonetics_obj.pronunciation.HEIMIN.IPA}}
-      {% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
-	,(士){{phonetics_obj.pronunciation.SHIZOKU.IPA}}
-      {% endif %}
+	〔{{phonetics_obj.pronunciation.HEIMIN.IPA}}〕
+	{% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
+	,(士)〔{{phonetics_obj.pronunciation.SHIZOKU.IPA}}〕
+	{% endif %}
     </td>
   </tr>
   <tr>
@@ -83,14 +85,16 @@
 {%- endmacro %}
 
 {% macro render_okinawago_sentence(phonetics_obj) -%}
-  <p class="okinawago">
-    <i> {{phonetics_obj.pronunciation.HEIMIN.kana[0]}} </i><br>
-    {{phonetics_obj.pronunciation.HEIMIN.IPA}}
+  <p>
+    <i> {{phonetics_obj.pronunciation.HEIMIN.kana[0]}} </i>
+    {% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
+      (士: <i> {{phonetics_obj.pronunciation.SHIZOKU.kana[0]}} </i>)
+    {% endif %}
+    <br>
+    〔{{phonetics_obj.pronunciation.HEIMIN.IPA}}
+    {% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
+      (士: {{phonetics_obj.pronunciation.SHIZOKU.IPA}})
+    {% endif %}
+    〕
   </p>
-  {% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
-    <p class="okinawago">
-      <i> {{phonetics_obj.pronunciation.SHIZOKU.kana[0]}} </i><br>
-      {{phonetics_obj.pronunciation.SHIZOKU.IPA}}
-    </p>
-  {% endif %}
 {%- endmacro %}
