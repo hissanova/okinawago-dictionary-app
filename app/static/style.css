@@ -4,6 +4,8 @@
     --moegi: #98a820;
     --silver: gray;
     --seiheki: #488484;
+    --pale-yellow: #ebe1a9;
+    --bold-border-width: 2px;
 }
 
 /* navbar */
@@ -58,6 +60,9 @@ h4 {
 p {
     margin-left: 15px;
 }
+p.okinawago {
+    margin-left: 30px;
+}
 
 a {
     color: var(--seiheki)
@@ -71,12 +76,52 @@ hr { border: none;
 input {
     accent-color: var(--seiheki);
 }
+
 label {
     font-weight: normal;
 }
 
 table, th, td {
+    margin-left: 15px;
     padding: 5px;
-    border: 1.5px solid var(--silver);
+    border: 1.7px solid var(--silver);
+
 }
+
+th {
+    background-color: var(--pale-yellow);
+    font-weight: 550;
+}
+
+/* th.tg-0lax { */
+/*     font-weight: 550; */
+/*     background-color: #eeeeee; */
+/* } */
+
+
+
+table#T_phonetics td {
+    border-right-width: var(--bold-border-width);
+}
+
+th[id^='T_phonetics_level1_'] {
+    border-right-width: var(--bold-border-width);
+}
+
+th[id^='T_phonetics_level0'] {
+    border-left-width: var(--bold-border-width);
+}
+
+table#T_phonetics th[class^='blank'], th[id^='T_phonetics_level0_col'] {
+    border-width: var(--bold-border-width);
+}
+
+table#T_phonetics thead, table#T_phonetics tr:nth-child(3n) {
+    border-bottom: var(--bold-border-width) solid var(--silver);
+}
+
+#T_phonetics_row0_col5, #T_phonetics_row1_col5, #T_phonetics_row2_col5, #T_phonetics_row3_col5, #T_phonetics_row4_col5, #T_phonetics_row5_col5, #T_phonetics_row6_col5, #T_phonetics_row7_col5, #T_phonetics_row8_col5, #T_phonetics_row9_col1, #T_phonetics_row9_col3, #T_phonetics_row9_col5, #T_phonetics_row10_col1, #T_phonetics_row10_col3, #T_phonetics_row10_col5, #T_phonetics_row11_col1, #T_phonetics_row11_col3, #T_phonetics_row11_col5, #T_phonetics_row12_col2, #T_phonetics_row12_col4, #T_phonetics_row12_col5, #T_phonetics_row13_col2, #T_phonetics_row13_col4, #T_phonetics_row13_col5, #T_phonetics_row14_col2, #T_phonetics_row14_col4, #T_phonetics_row14_col5, #T_phonetics_row15_col5, #T_phonetics_row16_col5, #T_phonetics_row17_col5, #T_phonetics_row18_col1, #T_phonetics_row18_col3, #T_phonetics_row18_col5, #T_phonetics_row19_col1, #T_phonetics_row19_col3, #T_phonetics_row19_col5, #T_phonetics_row20_col1, #T_phonetics_row20_col3, #T_phonetics_row20_col5, #T_phonetics_row21_col2, #T_phonetics_row21_col4, #T_phonetics_row21_col5, #T_phonetics_row22_col2, #T_phonetics_row22_col4, #T_phonetics_row22_col5, #T_phonetics_row23_col2, #T_phonetics_row23_col4, #T_phonetics_row23_col5, #T_phonetics_row24_col5, #T_phonetics_row25_col5, #T_phonetics_row26_col5, #T_phonetics_row27_col0, #T_phonetics_row27_col2, #T_phonetics_row27_col4, #T_phonetics_row27_col5, #T_phonetics_row28_col0, #T_phonetics_row28_col2, #T_phonetics_row28_col4, #T_phonetics_row28_col5, #T_phonetics_row29_col0, #T_phonetics_row29_col2, #T_phonetics_row29_col4, #T_phonetics_row29_col5, #T_phonetics_row30_col1, #T_phonetics_row30_col3, #T_phonetics_row30_col5, #T_phonetics_row31_col1, #T_phonetics_row31_col3, #T_phonetics_row31_col5, #T_phonetics_row32_col1, #T_phonetics_row32_col3, #T_phonetics_row32_col5, #T_phonetics_row33_col5, #T_phonetics_row34_col5, #T_phonetics_row35_col5, #T_phonetics_row36_col5, #T_phonetics_row37_col5, #T_phonetics_row38_col5, #T_phonetics_row39_col5, #T_phonetics_row40_col5, #T_phonetics_row41_col5, #T_phonetics_row42_col5, #T_phonetics_row43_col5, #T_phonetics_row44_col5, #T_phonetics_row45_col5, #T_phonetics_row46_col5, #T_phonetics_row47_col5, #T_phonetics_row48_col5, #T_phonetics_row49_col5, #T_phonetics_row50_col5, #T_phonetics_row51_col5, #T_phonetics_row52_col5, #T_phonetics_row53_col5, #T_phonetics_row54_col1, #T_phonetics_row54_col3, #T_phonetics_row54_col4, #T_phonetics_row54_col5, #T_phonetics_row55_col1, #T_phonetics_row55_col3, #T_phonetics_row55_col4, #T_phonetics_row55_col5, #T_phonetics_row56_col1, #T_phonetics_row56_col3, #T_phonetics_row56_col4, #T_phonetics_row56_col5, #T_phonetics_row57_col5, #T_phonetics_row58_col5, #T_phonetics_row59_col5, #T_phonetics_row60_col1, #T_phonetics_row60_col3, #T_phonetics_row60_col5, #T_phonetics_row61_col1, #T_phonetics_row61_col3, #T_phonetics_row61_col5, #T_phonetics_row62_col1, #T_phonetics_row62_col3, #T_phonetics_row62_col5, #T_phonetics_row63_col2, #T_phonetics_row63_col4, #T_phonetics_row63_col5, #T_phonetics_row64_col2, #T_phonetics_row64_col4, #T_phonetics_row64_col5, #T_phonetics_row65_col2, #T_phonetics_row65_col4, #T_phonetics_row65_col5, #T_phonetics_row66_col5, #T_phonetics_row67_col5, #T_phonetics_row68_col5, #T_phonetics_row69_col1, #T_phonetics_row69_col3, #T_phonetics_row69_col5, #T_phonetics_row70_col1, #T_phonetics_row70_col3, #T_phonetics_row70_col5, #T_phonetics_row71_col1, #T_phonetics_row71_col3, #T_phonetics_row71_col5, #T_phonetics_row72_col5, #T_phonetics_row73_col5, #T_phonetics_row74_col5, #T_phonetics_row75_col1, #T_phonetics_row75_col3, #T_phonetics_row75_col5, #T_phonetics_row76_col1, #T_phonetics_row76_col3, #T_phonetics_row76_col5, #T_phonetics_row77_col1, #T_phonetics_row77_col3, #T_phonetics_row77_col5, #T_phonetics_row78_col0, #T_phonetics_row78_col2, #T_phonetics_row78_col3, #T_phonetics_row78_col4, #T_phonetics_row78_col5, #T_phonetics_row79_col0, #T_phonetics_row79_col2, #T_phonetics_row79_col3, #T_phonetics_row79_col4, #T_phonetics_row79_col5, #T_phonetics_row80_col0, #T_phonetics_row80_col2, #T_phonetics_row80_col3, #T_phonetics_row80_col4, #T_phonetics_row80_col5, #T_phonetics_row81_col5, #T_phonetics_row82_col5, #T_phonetics_row83_col5, #T_phonetics_row84_col0, #T_phonetics_row84_col1, #T_phonetics_row84_col2, #T_phonetics_row84_col4, #T_phonetics_row84_col5, #T_phonetics_row85_col0, #T_phonetics_row85_col1, #T_phonetics_row85_col2, #T_phonetics_row85_col4, #T_phonetics_row85_col5, #T_phonetics_row86_col0, #T_phonetics_row86_col1, #T_phonetics_row86_col2, #T_phonetics_row86_col4, #T_phonetics_row86_col5, #T_phonetics_row87_col1, #T_phonetics_row87_col3, #T_phonetics_row87_col5, #T_phonetics_row88_col1, #T_phonetics_row88_col3, #T_phonetics_row88_col5, #T_phonetics_row89_col1, #T_phonetics_row89_col3, #T_phonetics_row89_col5, #T_phonetics_row90_col1, #T_phonetics_row90_col5, #T_phonetics_row91_col1, #T_phonetics_row91_col5, #T_phonetics_row92_col1, #T_phonetics_row92_col5, #T_phonetics_row93_col1, #T_phonetics_row93_col5, #T_phonetics_row94_col1, #T_phonetics_row94_col5, #T_phonetics_row95_col1, #T_phonetics_row95_col5, #T_phonetics_row96_col5, #T_phonetics_row97_col5, #T_phonetics_row98_col5, #T_phonetics_row99_col1, #T_phonetics_row99_col3, #T_phonetics_row99_col5, #T_phonetics_row100_col1, #T_phonetics_row100_col3, #T_phonetics_row100_col5, #T_phonetics_row101_col1, #T_phonetics_row101_col3, #T_phonetics_row101_col5, #T_phonetics_row102_col2, #T_phonetics_row102_col5, #T_phonetics_row103_col2, #T_phonetics_row103_col5, #T_phonetics_row104_col2, #T_phonetics_row104_col5, #T_phonetics_row105_col2, #T_phonetics_row105_col4, #T_phonetics_row105_col5, #T_phonetics_row106_col2, #T_phonetics_row106_col4, #T_phonetics_row106_col5, #T_phonetics_row107_col2, #T_phonetics_row107_col4, #T_phonetics_row107_col5, #T_phonetics_row108_col0, #T_phonetics_row108_col1, #T_phonetics_row108_col2, #T_phonetics_row108_col3, #T_phonetics_row108_col4, #T_phonetics_row109_col0, #T_phonetics_row109_col1, #T_phonetics_row109_col2, #T_phonetics_row109_col3, #T_phonetics_row109_col4, #T_phonetics_row110_col0, #T_phonetics_row110_col1, #T_phonetics_row110_col2, #T_phonetics_row110_col3, #T_phonetics_row110_col4, #T_phonetics_row111_col0, #T_phonetics_row111_col1, #T_phonetics_row111_col2, #T_phonetics_row111_col3, #T_phonetics_row111_col4, #T_phonetics_row112_col0, #T_phonetics_row112_col1, #T_phonetics_row112_col2, #T_phonetics_row112_col3, #T_phonetics_row112_col4, #T_phonetics_row113_col0, #T_phonetics_row113_col1, #T_phonetics_row113_col2, #T_phonetics_row113_col3, #T_phonetics_row113_col4, #T_phonetics_row114_col0, #T_phonetics_row114_col1, #T_phonetics_row114_col2, #T_phonetics_row114_col3, #T_phonetics_row114_col4, #T_phonetics_row115_col0, #T_phonetics_row115_col1, #T_phonetics_row115_col2, #T_phonetics_row115_col3, #T_phonetics_row115_col4, #T_phonetics_row115_col5, #T_phonetics_row116_col0, #T_phonetics_row116_col1, #T_phonetics_row116_col2, #T_phonetics_row116_col3, #T_phonetics_row116_col4 {
+    background-color: #ebf6f7;
+}
+
 

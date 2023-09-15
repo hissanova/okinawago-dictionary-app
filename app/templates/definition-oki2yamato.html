@@ -8,47 +8,24 @@
       {% for content in contents %}
 	<hr>
 	<h2>{{ ",".join(content.index) }}</h2> 
-	<h4>発音</h4> <p>/{{ content.pronunciation }}/、アクセント:{{ content.accent }}</p>
+	<h4>発音</h4>
+          <p>{{ render_phonetics(content.phonetics, content.accent) }}</p> 
 	<h4>品詞</h4>
 	<p>[{{ content.pos.type }}]</p>
 	<h4>意味</h4>
 	{% for meaning in content.meaning %}
-	<p>{{ meaning }}</p>
+	  {% for paragraph in meaning %}
+	    {% if paragraph.get("yamato") %} 
+	      <p>{{ paragraph.yamato |  multi_replace(paragraph.okinawago) | safe }}</p>
+	    {% elif paragraph.get("okinawago") %}
+	      <p>{{ render_okinawago_sentence(paragraph.okinawago) }}</p>
+	    {% endif %} 
+	  {% endfor %}
 	{% endfor %}
 	{% if content.pos.conjugation %}
 	<h4>活用</h4>
-	<p>
-	    <table>
-		<thead>
-		    <tr>
-			<th>語幹</th>
-			<th colspan="2">活用</th>
-		    </tr>
-		</thead>		
-		<tr>
-		    <td> 基本語幹 /{{ content.pos.conjugation.stems.基本 }}-/ </td>
-		    <td> 否定形 </td>
-		    <td> {{ content.pos.conjugation.基本派生形.否定形.kana }} /{{ content.pos.conjugation.基本派生形.否定形.pronunciation }}/ </td>
-		</tr>
-		<tr>
-		    <td> 連用語幹 /{{ content.pos.conjugation.stems.連用 }}-/ </td>
-		    <td> 連用形 </td>
-		    <td> {{ content.pos.conjugation.連用派生形.連用形.kana }} /{{ content.pos.conjugation.連用派生形.連用形.pronunciation }}/ </td>
-		</tr>
-		<tr>
-		    <td rowspan="3"> 音便語幹 /{{ content.pos.conjugation.stems.音便 }}-/ </td>
-		    <td> 過去形 </td>
-		    <td> {{ content.pos.conjugation.音便派生形.過去形.kana }} /{{ content.pos.conjugation.音便派生形.過去形.pronunciation }}/ </td>
-		</tr>
-		<tr>
-		    <td> てぃ形 </td>
-		    <td> {{ content.pos.conjugation.音便派生形.て形.kana }} /{{ content.pos.conjugation.音便派生形.て形.pronunciation }}/ </td>
-		</tr>
-		<tr>
-		    <td> 継続形 </td>
-		    <td> {{ content.pos.conjugation.音便派生形.継続形.kana }} /{{ content.pos.conjugation.音便派生形.継続形.pronunciation }}/ </td>
-		</tr>
-	    </table>
+        <p>
+	  {{render_conjugation_table(content.pos.conjugation)}}
 	</p>
 	{% endif %}
 	{% if content['bungo-type'] %}
@@ -67,3 +44,83 @@
     {% endif %}
   </div>
 {% endblock %}
+
+{% macro render_conjugation_table(conjugation_obj) -%}
+  <table>
+    <thead>
+      <tr>
+	<th>語幹</th>
+	<th>活用</th>
+	<th>音素</th>
+	<th>カナ</th>
+	<th>IPA</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <th> 基本語幹 /{{ conjugation_obj.stems.基本 }}-/ </th>
+      <th> 否定形 </th>
+      <td>
+	{{ conjugation_obj.基本派生形.否定形 | render_phonetics_list_phonemes }}
+      </td>
+      <td>
+	{{ conjugation_obj.基本派生形.否定形 | render_phonetics_list_kana }}
+      </td>
+      <td>
+	{{ conjugation_obj.基本派生形.否定形 | render_phonetics_list_IPA }}
+      </td>
+    </tr>
+    <tr>
+      <th> 連用語幹 /{{ conjugation_obj.stems.連用 }}-/ </th>
+      <th> 連用形 </th>
+      <td>
+	{{ conjugation_obj.連用派生形.連用形 | render_phonetics_list_phonemes }}
+      </td>
+      <td>
+	{{ conjugation_obj.連用派生形.連用形 | render_phonetics_list_kana }}
+      </td>
+      <td>
+	{{ conjugation_obj.連用派生形.連用形 | render_phonetics_list_IPA }}
+      </td>
+    </tr>
+    <tr>
+      <th rowspan="3"> 音便語幹 /{{ conjugation_obj.stems.音便 }}-/ </th>
+      <th> 過去形 </th>
+      <td>
+	{{ conjugation_obj.音便派生形.過去形 | render_phonetics_list_phonemes }}
+      </td>
+      <td>
+	{{ conjugation_obj.音便派生形.過去形 | render_phonetics_list_kana }}
+      </td>
+      <td>
+	{{ conjugation_obj.音便派生形.過去形 | render_phonetics_list_IPA }}
+      </td>
+    </tr>
+    <tr>
+      <th> てぃ形 </th>
+      <td>
+	{{ conjugation_obj.音便派生形.て形 | render_phonetics_list_phonemes }}
+      </td>
+      <td>
+	{{ conjugation_obj.音便派生形.て形 | render_phonetics_list_kana }}
+      </td>
+      <td>
+	{{ conjugation_obj.音便派生形.て形 | render_phonetics_list_IPA }}
+      </td>
+    </tr>
+    <tr>
+      <th> 継続形 </th>
+      <td>
+	{{ conjugation_obj.音便派生形.継続形 | render_phonetics_list_phonemes }}
+      </td>
+      <td>
+	{{ conjugation_obj.音便派生形.継続形 | render_phonetics_list_kana }}
+      </td>
+      <td>
+	{{ conjugation_obj.音便派生形.継続形 | render_phonetics_list_IPA }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+{%- endmacro %}
+

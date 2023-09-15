@@ -11,7 +11,7 @@ gunicorn = "^20.1.0"
 Flask-Bootstrap = "^3.3.7"
 Flask-WTF = "^1.0.1"
 wanakana-python = "^1.2.2"
-okinawago-dictionary = {path = "extra_wheels/okinawago_dictionary-0.3.1-py3-none-any.whl"}
+okinawago-dictionary = {path = "extra_wheels/okinawago_dictionary-0.4.0-py3-none-any.whl"}
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.971"

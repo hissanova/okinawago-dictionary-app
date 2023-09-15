@@ -8,65 +8,87 @@
     {% if contents %}
       {% for content in contents %}
 	<hr>
-	<h2>{{ ",".join(content.index) }}</h2>
-	<h4>漢字</h4> <p>{{ content.kanji }}</p>
-	{% if content.explanation %}
-	  <h4>補足説明</h4><p>{{ content.explanation }}</p>
-	{% endif %}
-	<h4>内容</h4>
-	    <p>沖縄語：
-		<ul>
-		    {% for item in content.contents.base %}
-		    {% if item['kana'] %}
-		    <li>
-			{% if item['lang'] == 'Okinawa' %}
-			{% if item['reference'] %}c.f. {% endif %}
-			<a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
-			    {{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
-			{% elif item['lang'] == 'Yamato' %}
-			{% if item['reference'] %}c.f. {% endif %}
-			<a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
-			    {{ item['kana'] }}</a>
-			{% endif %}
-		    </li>
-		    {% endif %}
-		    {% endfor %}
-		</ul>
-	    </p>
-	    <p>関連語・フレーズ：
-		<ul>
-		    {% for phrases in content.contents.related %}
-		    <li>
-			{% if phrases[0]['reference'] %}c.f.
-			<a href="/definition/yamato2oki/{{ phrases[0]['kana'] | urlencode }}">
-			    {{ phrases[0]['kana'] }}</a>
-			{% else %}
-			{{ phrases[0]['kana'] }}
-			{% endif %}
-			<ul>
-			    {% for item in phrases[1:] %}
-			    <li>
-				{% if item['lang'] == 'Okinawa' %}
-				{% if item['reference'] %}c.f. {% endif %}
-				<a href="/definition/oki2yamato/{{ item['kana'] | first | urlencode }}">
-				    {{ ",".join(item['kana']) }}</a> /{{ item['pronunciation'] }}/
-				{% elif item['lang'] == 'Yamato' %}
-				{% if item['reference'] %}c.f. {% endif %}
-				<a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
-				    {{ item['kana'] }}</a>
-				{% endif %}
-			    </li>
-			    {% endfor %}
-			</ul>
-		    </li>
-		    {% endfor %}
-		</ul>
-	    </p>
-	    {% endfor %}
-	    <hr>
-	    {% else %}
-	    <p>見つかりませんでした。</p>
-	    {% endif %}
+	<h2>
+	  {{ ",".join(content.index) }}
+	</h2>
+	<h4>漢字</h4>
+    <p>
+      {{ content.kanji }}
+    </p>
+    {% if content.explanation %}
+      <h4>補足説明</h4><p>{{ content.explanation }}</p>
+    {% endif %}
+    <h4>内容</h4>
+    <p>沖縄語：
+      <ul>
+	{% for item in content.contents.base %}
+	  <li>
+	    {{ render_item(item) }}
+	  </li>
+	{% endfor %}
+      </ul>
+    </p>
+    <p>関連語・フレーズ：
+      <ul>
+	{{ render_phrase_list(content.contents.related) }}
+      </ul>
+    </p>
+  {% endfor %}
+  <hr>
+{% else %}
+  <p>見つかりませんでした。</p>
+{% endif %}
   </div>
 {% endblock %}
-  
+
+{% macro render_phrase_list(phrase_list) -%}
+  {% for phrases in phrase_list %}
+    <li>
+      {% set head = phrases[0] %}  
+      {% if head['reference'] %}c.f.  
+	<a href="/definition/yamato2oki/{{ head['kana'] | urlencode }}">  
+	  {{ head['kana'] }}  
+	</a>  
+      {% else %}  
+	{{ head['kana'] }}  
+      {% endif %}  
+      {{ render_related(phrases[1:]) }}
+    </li>
+  {% endfor %}
+{%- endmacro %}
+
+{% macro render_related(related) -%}
+  <ul>
+  {% for item in related %}
+    <li>
+      {{ render_item(item) }}
+    </li>
+  {% endfor %}
+  </ul>
+{%- endmacro %}
+
+
+{% macro render_item(item) -%}
+  {% if item['lang'] == 'Okinawa' %}
+    {% if item['reference'] %}c.f.{% endif %}
+    {% set kana = item['phonetics']['pronunciation']['HEIMIN']['kana'] | first %}
+    {% set phoneme = item['phonetics']['phonemes']['original'] %}
+    {% if item.get('connotation') %}
+      ({{item['connotation']}})
+    {% endif %}
+    <a href="/definition/oki2yamato/{{ kana | urlencode }}">
+      {{ kana }}
+    </a> /{{ phoneme }}/
+    {% if item.get('related') %}
+      {{ render_related(item['related']) }}
+    {% endif %}
+  {% elif item['lang'] == 'Yamato' %}
+    {% if item['reference'] %}c.f.
+      <a href="/definition/yamato2oki/{{ item['kana'] | urlencode }}">
+	{{ item['kana'] }}
+      </a>
+    {% else %}
+      {{ item['kana'] }}
+    {% endif %}
+  {% endif %} 
+{%- endmacro %}

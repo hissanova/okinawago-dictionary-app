@@ -30,6 +30,7 @@
 	<div class="navbar-collapse collapse">
 	    <ul class="nav navbar-nav">
 		<li><a href="/">ホーム</a></li>
+		<li><a href="/pronunciation">発音とカナ表記</a></li>
 		<li><a href="/about">この辞典について</a></li>
 	    </ul>
 	</div>
@@ -42,3 +43,58 @@
     {% block page_content %}{% endblock %}
 </div>
 {% endblock %}
+
+{% macro render_phonetics(phonetics_obj, accent) -%}
+<table class="tg">
+<tbody>
+  <tr>
+    <th class="tg-0lax">音素</th>
+    <td class="tg-0lax">
+	/{{ phonetics_obj.phonemes.original | safe }}
+	{% if phonetics_obj.phonemes.original != phonetics_obj.phonemes.simplified %}
+	,{{ phonetics_obj.phonemes.simplified}}
+	{% endif %}
+	/
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-0lax">カナ</th>
+    <td class="tg-0lax">
+    {{",".join(phonetics_obj.pronunciation.HEIMIN.kana)}}
+      {% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
+	,(士){{",".join(phonetics_obj.pronunciation.SHIZOKU.kana)}}
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-0lax">IPA</th>
+    <td class="tg-0lax">
+	〔{{phonetics_obj.pronunciation.HEIMIN.IPA}}〕
+	{% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
+	,(士)〔{{phonetics_obj.pronunciation.SHIZOKU.IPA}}〕
+	{% endif %}
+    </td>
+  </tr>
+  <tr>
+    <th class="tg-0lax">アクセント</th>
+    <td class="tg-0lax">{{accent}}</td>
+  </tr>
+  
+</tbody>
+</table>
+{%- endmacro %}
+
+{% macro render_okinawago_sentence(phonetics_obj) -%}
+  <p>
+    <i> {{phonetics_obj.pronunciation.HEIMIN.kana[0]}} </i>
+    {% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
+      (士: <i> {{phonetics_obj.pronunciation.SHIZOKU.kana[0]}} </i>)
+    {% endif %}
+    <br>
+    〔{{phonetics_obj.pronunciation.HEIMIN.IPA}}
+    {% if phonetics_obj["pronunciation"].get("SHIZOKU") %}
+      (士: {{phonetics_obj.pronunciation.SHIZOKU.IPA}})
+    {% endif %}
+    〕
+  </p>
+{%- endmacro %}
