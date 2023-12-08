@@ -665,7 +665,7 @@ mypy-extensions = [
     {file = "mypy_extensions-1.0.0.tar.gz", hash = "sha256:75dbf8955dc00442a438fc4d0666508a9a97b6bd41aa2f0ffe9d2f2725af0782"},
 ]
 okinawago-dictionary = [
-    {file = "okinawago_dictionary-0.4.0-py3-none-any.whl", hash = "sha256:b1115a5f178292420632f8bcd9bc3426fcd7a4f3e54dbf7415e820ef205ffb68"},
+    {file = "okinawago_dictionary-0.4.0-py3-none-any.whl", hash = "sha256:2a195bbed9bb5207e9f6ccd568681c6582a890eab76d583c8089a24dd1cd4cd0"},
 ]
 parso = [
     {file = "parso-0.8.3-py2.py3-none-any.whl", hash = "sha256:c001d4636cd3aecdaf33cbb40aebb59b094be2a74c556778ef5576c175e19e75"},
