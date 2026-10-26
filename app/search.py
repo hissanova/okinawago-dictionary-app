@@ -6,6 +6,9 @@ from wanakana import to_hiragana
 from okinawago_dictionary.dictionary import Dictionary, oki_dict, yamato_dict, katsuyou_jiten
 
 
+MAX_SEARCH_QUERY_LENGTH = 100
+
+
 class Match(NamedTuple):
     dict_type: str
     dict_type_for_display: str
@@ -49,7 +52,7 @@ def _get_filter(word: str, search_type: str) -> Filter:
 def _emphasize_match(match: Match, str_to_emph: str) -> Match:
     if match.dict_type == "yamato2oki":
         str_to_emph = to_hiragana(str_to_emph)
-    pattern = re.compile(r"(" + str_to_emph + r")")
+    pattern = re.compile(r"(" + re.escape(str_to_emph) + r")")
     return Match(
         match.dict_type, match.dict_type_for_display, match.matched_ids,
         match.matched_words,
@@ -62,7 +65,7 @@ def _get_sorter(search_type: str, word: str, normaliser) -> Sorter:
         def _key_func(match: Match):
             matched_words = [normaliser(word) for word in match.matched_words]
             matched_index, distance = min(map(
-                lambda w: (w, len(re.sub(word, '', w))), matched_words),
+                lambda w: (w, len(re.sub(re.escape(word), '', w))), matched_words),
                                           key=lambda x: x[1])
             index = matched_index.index(word)
             return (index, distance, matched_index)
@@ -80,6 +83,11 @@ def _get_sorter(search_type: str, word: str, normaliser) -> Sorter:
 
 
 dict_types = {'oki2yamato': '沖', 'yamato2oki': '日', 'katsuyou_jiten': 'う'}
+
+
+def normalize_search_query(query_word) -> str:
+    """Return a safe string value for user-supplied search input."""
+    return query_word if isinstance(query_word, str) else ""
 
 
 def get_results(
@@ -104,6 +112,10 @@ def search(
     search_type: str,
     dict_types: List[str],
 ) -> List[Match]:
+    query_word = normalize_search_query(query_word)
+    if not query_word or len(query_word) > MAX_SEARCH_QUERY_LENGTH:
+        return []
+
     matched_results = []
     sort_func = _get_sorter(search_type, oki_dict.normalise_kana(query_word),
                             oki_dict.normalise_kana)

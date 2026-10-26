@@ -14,17 +14,35 @@
 </div>
 <div class="page-body">    
 	<form method="POST">
+            {{ enquiry_form.hidden_tag() }}
+            {% if enquiry_form.csrf_token.errors %}
+            <div class="text-danger" role="alert">
+                <p>ページを再読み込みして、もう一度検索してください。</p>
+                {% for error in enquiry_form.csrf_token.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
 	    <div class="form-group">
 		{{ enquiry_form.word.label }}<br>
 		{{ enquiry_form.word }}
+		{% for error in enquiry_form.word.errors %}
+		<p class="text-danger">{{ error }}</p>
+		{% endfor %}
 	    </div>
 	    <div class="form-group">
 		{{ enquiry_form.dict_type.label }}
 		{{ enquiry_form.dict_type }}
+                {% for error in enquiry_form.dict_type.errors %}
+                <p class="text-danger" role="alert">辞書選択：{{ error }}</p>
+                {% endfor %}
 	    </div>
 	    <div class="form-group">
 		{{ enquiry_form.search_type.label }}
 		{{ enquiry_form.search_type }}
+                {% for error in enquiry_form.search_type.errors %}
+                <p class="text-danger" role="alert">検索方法：{{ error }}</p>
+                {% endfor %}
 	    </div>
 	    {{ enquiry_form.submit }}		
 	</form>
