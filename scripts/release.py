@@ -2,6 +2,7 @@
 import argparse
 from copy import deepcopy
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -27,18 +28,56 @@ class Conflict(RuntimeError):
     """A generation precondition failed; never retry a mutation blindly."""
 
 
-def command(args, timeout=60, include_error=False):
+def diagnostic_stderr(value):
+    """Keep CLI diagnostics, redact credentials, and omit JSON/YAML resource dumps."""
+    if isinstance(value, bytes):  # TimeoutExpired can carry bytes even with text=True.
+        value = value.decode('utf-8', errors='replace')
+    value = value or ''
+    value = re.sub(r'\x1b\[[0-9;]*[A-Za-z]', '', value)
+    value = re.sub(r'(?i)\b(?:Bearer|Basic)\s+[A-Za-z0-9._~+/=-]+', '[redacted authorization]', value)
+    value = re.sub(r'''(?ix)["']?\b(?:access[_ -]?token|id[_ -]?token|refresh[_ -]?token|
+                   client[_ -]?secret|authorization|secret_key)["']?\s*[:=]\s*["']?[^\s,"'}]+''',
+                   '[redacted credential]', value)
+    value = re.sub(r'\bya29\.[A-Za-z0-9._~-]+', '[redacted token]', value)
+    value = re.sub(r'\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+',
+                   '[redacted token]', value)
+    lines = []
+    resource_dump = False
+    for line in value.splitlines():
+        if re.match(r'^\s*(ERROR|WARNING):', line):
+            resource_dump = False
+        # Configuration belongs in neither logs nor exception messages. Resume
+        # only at the next diagnostic marker after a structured-output section.
+        if (re.search(r'[{}]', line) or line.lstrip().startswith('[') or
+                re.match(r'^\s*(?:ERROR:\s*)?(?:apiVersion|kind|metadata|spec|status)\s*:', line)):
+            prefix = line.split('{', 1)[0] if '{' in line else ''
+            if not resource_dump:
+                lines.append(prefix + '[structured output omitted]')
+            resource_dump = True
+        elif not resource_dump:
+            lines.append(line)
+    return '\n'.join(lines).strip()[-4000:] or '(no diagnostic stderr)'
+
+
+def command(args, timeout=60, include_error=False, operation=None):
     # Capture configuration output: never print service env or access tokens.
-    result = subprocess.run(args, text=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE, timeout=timeout)
+    operation = operation or f'{args[0]} {args[1]}'
+    try:
+        result = subprocess.run(args, text=True, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, timeout=timeout)
+    except subprocess.TimeoutExpired as error:
+        detail = f'; stderr: {diagnostic_stderr(error.stderr)}' if include_error else ''
+        raise RuntimeError(f'{operation} timed out after {timeout}s (exit unknown){detail}') from None
     if result.returncode:
-        detail = f': {result.stderr.strip()}' if include_error else ''
-        raise RuntimeError(f'{args[0]} {args[1]} failed (exit {result.returncode}){detail}')
+        detail = f'; stderr: {diagnostic_stderr(result.stderr)}' if include_error else ''
+        raise RuntimeError(f'{operation} failed (exit {result.returncode}){detail}')
     return result.stdout.strip()
 
 
 def gcloud(*args, timeout=60):
-    return command(['gcloud', *args, f'--project={PROJECT}', '--quiet'], timeout)
+    cloud_run = args[:1] == ('run',)
+    return command(['gcloud', *args, f'--project={PROJECT}', '--quiet'], timeout,
+                   include_error=cloud_run, operation='gcloud ' + ' '.join(args[:3]))
 
 
 class Storage:
@@ -361,12 +400,16 @@ def main():
     if published['tag'] != expected_tag or not re.fullmatch(r'sha256:[0-9a-f]{64}', published['digest']):
         raise RuntimeError('Published image identity mismatch')
     attempt = uuid.uuid4().hex
-    suffix = 'b' + args.build_id.replace('-', '') + '-' + attempt[:4]
+    identity_hash = hashlib.sha256(f'{args.build_id}:{attempt}'.encode()).hexdigest()
+    # Tag + service is limited to 46 characters, separately from the 63-character
+    # revision-name limit. Keep full identities in the release record, not names.
+    tag = 'p' + identity_hash[:20]
+    suffix = 'r' + identity_hash[:32]
     record = dict(project=PROJECT, service=SERVICE, region=REGION,
                   commit_sha=args.commit_sha, build_id=args.build_id, build_region=args.build_region,
                   trigger_id=build['buildTriggerId'],
                   attempt=attempt, image=f'{REPOSITORY}@{published["digest"]}',
-                  digest=published['digest'], suffix=suffix, revision=f'{SERVICE}-{suffix}', tag=suffix,
+                  digest=published['digest'], suffix=suffix, revision=f'{SERVICE}-{suffix}', tag=tag,
                   promote=args.promote == 'true')
     Release(Cloud(), Storage(args.bucket), record, build_order(build['createTime'], args.build_id),
             args.promote == 'true').execute()
