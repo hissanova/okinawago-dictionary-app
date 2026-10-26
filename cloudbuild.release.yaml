@@ -1,0 +1,51 @@
+# Select explicitly in the production trigger. Never name this cloudbuild.yaml.
+# Keep promotion off until the initial tagged-URL verification is reviewed.
+substitutions:
+  _STATE_BUCKET: SET_ME
+  _PROMOTE: 'false'
+  _BUILD_REGION: global
+timeout: 2400s
+steps:
+  - id: build-once
+    name: gcr.io/cloud-builders/docker
+    timeout: 600s
+    volumes: [{name: release-tools, path: /release-tools}]
+    entrypoint: bash
+    env:
+      - RELEASE_PROJECT=${PROJECT_ID}
+    args: [scripts/build_release.sh, '${COMMIT_SHA}', '${BUILD_ID}']
+  - id: check-exact-image
+    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+    timeout: 360s
+    volumes: [{name: release-tools, path: /release-tools}]
+    entrypoint: python3
+    env:
+      - PATH=/release-tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/google-cloud-sdk/bin
+    args:
+      - scripts/check.py
+      - --image
+      - asia.gcr.io/okinawago-dictionary/okinawago-dictionary-app/okinawago-dictionary-app:${COMMIT_SHA}-${BUILD_ID}
+  - id: push-and-resolve-digest
+    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+    timeout: 780s
+    volumes: [{name: release-tools, path: /release-tools}]
+    entrypoint: python3
+    env:
+      - PATH=/release-tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/google-cloud-sdk/bin
+    args:
+      - scripts/publish_image.py
+      - asia.gcr.io/okinawago-dictionary/okinawago-dictionary-app/okinawago-dictionary-app:${COMMIT_SHA}-${BUILD_ID}
+  - id: locked-release
+    name: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+    timeout: 1500s
+    entrypoint: python3
+    env:
+      - RELEASE_PROJECT=${PROJECT_ID}
+    args:
+      - scripts/release.py
+      - --build-id=${BUILD_ID}
+      - --commit-sha=${COMMIT_SHA}
+      - --build-region=${_BUILD_REGION}
+      - --bucket=${_STATE_BUCKET}
+      - --promote=${_PROMOTE}
+# No images: stanza: push happens once, before digest deployment, never after it.

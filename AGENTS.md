@@ -8,6 +8,9 @@
 - `extra_wheels/`: 沖日辞典・日沖辞典・うちなーぐち活用辞典のデータを含むPythonパッケージ。
 - `tests/`: unittestによるアプリ・検索処理のテスト。
 - `scripts/check.py`・`scripts/smoke_http.py`: Dockerでの共通チェックとURL指定のHTTP確認。
+- `cloudbuild.release.yaml`・`scripts/release.py`: 同一イメージの検証・保存、排他制御付きCloud Run配置と切り替え。
+- `scripts/build_release.sh`・`scripts/publish_image.py`: 一度だけのビルドと保存先digestの照合。
+- `docs/development.md`・`docs/deployment.md`: 開発・確認とデプロイ移行・運用・復旧の詳細。
 - `Dockerfile`: 本番と共通のイメージ定義とGunicorn起動コマンド。
 - `.github/workflows/check.yml`: main向けPRとmainへのpushで `make check` を実行するCI。
 
@@ -17,8 +20,7 @@
 
 ```sh
 poetry install
-export SECRET_KEY='development-only-secret'
-poetry run flask --app app.main run --debug
+env SECRET_KEY=development-only-secret poetry run flask --app app.main run --debug
 poetry run python -m unittest discover -s tests -v
 ```
 
@@ -29,7 +31,7 @@ make check
 git diff --check
 ```
 
-`make check` はDockerfileをビルドし、同じイメージで既存unittestと通常のCMD（Gunicorn）によるHTTP確認を行う。HTTP確認だけを実行する場合は `python3 scripts/smoke_http.py <ベースURL>` を使う。準備、確認範囲、手動確認、GitHubの必須チェック設定の詳細は [README.md](README.md) を参照する。
+`make check` はDockerfileを一度ビルドし、同じイメージで全unittestと通常のCMD（Gunicorn）によるHTTP確認を行う。HTTP確認だけの場合は `python3 scripts/smoke_http.py <ベースURL>` を使う。準備、確認範囲、手動確認、GitHubの必須チェック設定は [開発ガイド](docs/development.md)、Cloud Runの配置・移行・切り戻し・ロック復旧は [デプロイガイド](docs/deployment.md) を参照する。
 
 ## 作業ルール
 
@@ -40,3 +42,4 @@ git diff --check
 - レビュー用の差分・ログは `/tmp` などリポジトリ外に保存し、コミット対象に含めない。
 - 検証結果を報告し、未実施の確認は実施済みと区別して理由を記載する。
 - コミット・push・マージ・本番設定変更・デプロイは、ユーザーから指示された範囲で行う。
+- 本番用のルート `cloudbuild.yaml` を追加しない。デプロイは既存サービスとシークレット参照を維持し、検証済みリビジョンを明示する。ロック・順序情報の自動破棄や、他実行のタグ削除を行わない。

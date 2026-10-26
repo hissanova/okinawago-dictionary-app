@@ -6,7 +6,7 @@ import sys
 import time
 from urllib.error import URLError
 from urllib.parse import quote, urlencode, urljoin, urlsplit
-from urllib.request import HTTPCookieProcessor, Request, build_opener
+from urllib.request import HTTPRedirectHandler, HTTPCookieProcessor, Request, build_opener
 
 
 class Page(HTMLParser):
@@ -32,10 +32,18 @@ class Page(HTMLParser):
             raise RuntimeError(f'Expected page content missing: {text!r}')
 
 
+class SameOriginRedirect(HTTPRedirectHandler):
+    def redirect_request(self, request, response, code, message, headers, new_url):
+        old, new = urlsplit(request.full_url), urlsplit(new_url)
+        if (old.scheme, old.netloc) != (new.scheme, new.netloc):
+            raise RuntimeError('Unexpected external redirect')
+        return super().redirect_request(request, response, code, message, headers, new_url)
+
+
 class Client:
     def __init__(self, base_url):
         self.base = base_url.rstrip('/') + '/'
-        self.opener = build_opener(HTTPCookieProcessor(CookieJar()))
+        self.opener = build_opener(SameOriginRedirect(), HTTPCookieProcessor(CookieJar()))
 
     def request(self, path='', data=None, timeout=5):
         url = urljoin(self.base, path)
