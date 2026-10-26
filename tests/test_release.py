@@ -4,6 +4,7 @@ from contextlib import redirect_stdout, redirect_stderr
 import io
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -190,6 +191,68 @@ class ReleaseSafetyTest(unittest.TestCase):
             'gcb-build-id': 'this-execution-build',
             'gcb-trigger-id': '166433e9-9b3d-4554-b92d-0d8c4e2aceb3',
         }, self.cloud.current['metadata']['labels'])
+
+    def test_main_generates_bounded_distinct_names_and_persists_full_identities(self):
+        first_build = '12345678-1234-1234-1234-123456789abc'
+        second_build = '12345678-1234-1234-1234-123456789abd'
+        first_attempt, second_attempt = 'a' * 31 + '1', 'a' * 31 + '2'
+        cases = [(first_build, first_attempt), (first_build, second_attempt),
+                 (second_build, first_attempt)]
+        tags, revisions = set(), set()
+        for build_id, attempt in cases:
+            with self.subTest(build_id=build_id, attempt=attempt), tempfile.TemporaryDirectory() as directory:
+                sha = 'b' * 40
+                build = dict(id=build_id, projectId=r.PROJECT, buildTriggerId=r.TRIGGER_ID,
+                             createTime='2026-10-26T00:00:00Z',
+                             substitutions={'COMMIT_SHA': sha, 'BRANCH_NAME': 'main'})
+                image_file = Path(directory) / 'image.json'
+                image_file.write_text(json.dumps(dict(
+                    tag=f'{r.REPOSITORY}:{sha}-{build_id}', digest='sha256:' + 'b' * 64)))
+                args = ['release.py', '--build-id', build_id, '--commit-sha', sha,
+                        '--bucket', 'release-state-bucket', '--image-file', str(image_file)]
+                with patch('sys.argv', args), patch.dict(r.os.environ, {'RELEASE_PROJECT': r.PROJECT}), \
+                        patch.object(r, 'gcloud', return_value=json.dumps(build)), \
+                        patch.object(r, 'Cloud', return_value=self.cloud), \
+                        patch.object(r, 'Storage', return_value=self.storage), \
+                        patch.object(r.uuid, 'uuid4', return_value=r.uuid.UUID(hex=attempt)):
+                    r.main()
+                saved = self.storage.read(f'release/records/{build_id}/{attempt}.json')[1]
+                self.assertEqual(build_id, saved['build_id'])
+                self.assertEqual(attempt, saved['attempt'])
+                self.assertEqual('verified_without_promotion', saved['phase'])
+                self.assertLessEqual(len(r.SERVICE) + len(saved['tag']), 46)
+                self.assertLessEqual(len(saved['revision']), 63)
+                for field in ['tag', 'suffix', 'revision']:
+                    self.assertRegex(saved[field], r'^[a-z][a-z0-9-]*[a-z0-9]$')
+                self.assertNotEqual(saved['tag'], saved['suffix'])
+                self.assertEqual(f'{r.SERVICE}-{saved["suffix"]}', saved['revision'])
+                self.assertEqual(saved['revision'], saved['observed_revision'])
+                self.assertIn(f'https://{saved["tag"]}---', saved['tag_url'])
+                tags.add(saved['tag'])
+                revisions.add(saved['revision'])
+        self.assertEqual(len(cases), len(tags))
+        self.assertEqual(len(cases), len(revisions))
+        self.assert_no_switch()
+
+    def test_real_cli_failure_records_diagnostics_and_retains_lock(self):
+        original_run = self.cloud.run
+        def run(*args, mutation=False):
+            if args[:2] == ('services', 'update'):
+                return r.Cloud.run(self.cloud, *args, mutation=mutation)
+            return original_run(*args, mutation=mutation)
+        result = subprocess.CompletedProcess([], 1, stdout='service definition must stay private',
+                                             stderr='ERROR: Combined traffic tag and service name cannot exceed 46 characters.')
+        release = self.release()
+        with patch.object(self.cloud, 'run', side_effect=run), \
+                patch.object(r.subprocess, 'run', return_value=result):
+            with self.assertRaisesRegex(RuntimeError, 'gcloud run services update failed \\(exit 1\\)'):
+                release.execute()
+        saved = self.storage.read(release.record_name)[1]
+        self.assertIn('cannot exceed 46 characters', saved['error'])
+        self.assertTrue(self.cloud.uncertain)
+        self.assertIsNotNone(self.storage.state()['owner'])
+        self.assertNotIn(result.stdout, self.output.getvalue())
+        self.assert_no_switch()
 
     def test_verify_only_leaves_production_and_watermark_unchanged(self):
         self.release(promote=False).execute()
@@ -384,7 +447,8 @@ class BoundaryTest(unittest.TestCase):
                         release.return_value.execute.assert_called_once()
                         generated = release.call_args.args[2]
                         self.assertLessEqual(len(generated['revision']), 63)
-                        self.assertIn(build_id.replace('-', ''), generated['tag'])
+                        self.assertEqual(build_id, generated['build_id'])
+                        self.assertLessEqual(len(r.SERVICE) + len(generated['tag']), 46)
                         self.assertFalse(release.call_args.args[4])  # safe CLI default
                         with patch.object(r, 'gcloud', return_value='{}') as deploy_cli:
                             r.Cloud().deploy(generated)
@@ -431,6 +495,51 @@ class BoundaryTest(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 cloud.promote('tested-revision')
         self.assertTrue(cloud.uncertain)
+
+    def test_run_failure_reports_operation_exit_and_redacted_stderr_only(self):
+        error = ('WARNING: Authorization: Bearer header-credential\n'
+                 'WARNING: access_token=access-credential refresh_token=refresh-credential\n'
+                 'WARNING: ya29.oauth-credential\n'
+                 'apiVersion: serving.knative.dev/v1\nkind: Service\n'
+                 'spec:\n  private-definition: private-config-value\n'
+                 'ERROR: (gcloud.run.services.update) Combined traffic tag and service name cannot exceed 46 characters.\n'
+                 '{"spec": {"private-definition": "json-config-value"}}')
+        result = subprocess.CompletedProcess([], 2, stdout='stdout-config-and-token', stderr=error)
+        cloud = r.Cloud()
+        with patch.object(r.subprocess, 'run', return_value=result):
+            with self.assertRaises(RuntimeError) as caught:
+                cloud.deploy(record())
+        message = str(caught.exception)
+        self.assertIn('gcloud run services update failed (exit 2)', message)
+        self.assertIn('Combined traffic tag and service name cannot exceed 46 characters.', message)
+        for private in ['header-credential', 'access-credential', 'refresh-credential',
+                        'oauth-credential', 'private-config-value', 'json-config-value', result.stdout]:
+            self.assertNotIn(private, message)
+        self.assertTrue(cloud.uncertain)
+
+    def test_run_timeout_reports_operation_and_partial_stderr_with_unknown_exit(self):
+        timeout = subprocess.TimeoutExpired('private-command-arguments', 300,
+                                            output=b'private-service-definition',
+                                            stderr=b'ERROR: connection closed; access_token=private-token')
+        cloud = r.Cloud()
+        with patch.object(r.subprocess, 'run', side_effect=timeout):
+            with self.assertRaises(RuntimeError) as caught:
+                cloud.promote('verified-revision')
+        message = str(caught.exception)
+        self.assertIn('gcloud run services update-traffic timed out after 300s (exit unknown)', message)
+        self.assertIn('connection closed', message)
+        for private in ['private-command-arguments', 'private-service-definition', 'private-token']:
+            self.assertNotIn(private, message)
+        self.assertTrue(cloud.uncertain)
+
+    def test_auth_failure_does_not_expose_captured_output(self):
+        result = subprocess.CompletedProcess([], 1, stdout='private-token', stderr='private-auth-diagnostic')
+        with patch.object(r.subprocess, 'run', return_value=result):
+            with self.assertRaises(RuntimeError) as caught:
+                r.gcloud('auth', 'print-access-token')
+        self.assertIn('exit 1', str(caught.exception))
+        self.assertNotIn(result.stdout, str(caught.exception))
+        self.assertNotIn(result.stderr, str(caught.exception))
 
     def test_smoke_never_follows_redirect_to_production_or_another_origin(self):
         handler = SameOriginRedirect()

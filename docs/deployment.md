@@ -21,7 +21,7 @@
 
 タグは `COMMIT_SHA-BUILD_ID` で追跡でき、配置はタグでなく `保存先@sha256:...` を使います。Cloud Buildの実行情報を読み、プロジェクト・ビルドID・本番トリガーID・mainブランチ・コミットSHAを照合します。配置時には `--update-labels` で `commit-sha`、`gcb-build-id`、`gcb-trigger-id` を今回の値へ更新し、無関係な既存ラベルを維持します。これらは直近の配置を示すため、検証中には本番送客先と異なる場合があります。送客先はtrafficと記録で確認します。トリガーはmainへのpushのみを対象にし、古いコミットの手動再実行を自動反映用途で使わないでください。
 
-配置は既存サービスの存在確認後に `gcloud run services update` を使います。別サービスを新規作成しません。`--no-traffic` とビルドID＋試行ID由来の固有タグ・リビジョン接尾辞を指定します。配置した名前のリビジョンがReadyであること、所属サービス、imageDigest、専用タグのリビジョン名とURL、既存SECRET_KEY参照を照合します。`latestReadyRevisionName` だけで対象を決定しません。
+配置は既存サービスの存在確認後に `gcloud run services update` を使います。別サービスを新規作成しません。`--no-traffic` と、完全なビルドID＋試行IDを入力にしたSHA-256由来の名前を指定します。検証用タグは `p`＋ハッシュ20桁（21文字）、リビジョン接尾辞は `r`＋ハッシュ32桁（33文字）と別々に生成します。タグには `len(サービス名) + len(タグ) <= 46`、リビジョン名全体には63文字以下という別の制限があり、本サービスではそれぞれ45文字・58文字です。完全なビルドID・試行IDと生成したタグ・接尾辞・リビジョン名を同じ記録に保存し、短い名前からも実行を追跡できます。タグが既存のものと衝突した場合は再利用せず中断します。配置した名前のリビジョンがReadyであること、所属サービス、imageDigest、専用タグのリビジョン名とURL、既存SECRET_KEY参照を照合します。`latestReadyRevisionName` だけで対象を決定しません。
 
 専用URLで [scripts/smoke_http.py](../scripts/smoke_http.py) によるCSRF・Cookie付き検索と3辞書の詳細本文を検証し、検証後に対応関係と本番トラフィックが変わっていないことを再確認します。成功時のみ `--to-revisions=検証済みリビジョン=100` で切り替え、切り替え後の割当も確認します。`--to-latest` は使いません。IAM・公開範囲・環境変数・シークレット・実行サービスアカウントを変更するフラグは渡しません。
 
@@ -120,15 +120,15 @@ gcloud run revisions describe APPROVED_REVISION --project=okinawago-dictionary -
 gcloud run services describe okinawago-dictionary-app --project=okinawago-dictionary --region=asia-southeast1 --format='yaml(spec.traffic,status.latestCreatedRevisionName,status.latestReadyRevisionName,status.traffic)'
 ```
 
-2. 確認したイメージのdigestを `APPROVED_DIGEST` に指定し、復旧用リビジョンを送客なしで作ります。これにより、未検証の既存latestを選ばずに復旧対象を最新として配置できます。`UNIQUE_SUFFIX` は短い小文字英数字の固有値に置き換え、`recovery-UNIQUE_SUFFIX` というタグが既に存在しないことを直前のtraffic出力で確認します。可変のイメージタグは使いません。
+2. 確認したイメージのdigestを `APPROVED_DIGEST` に指定し、復旧用リビジョンを送客なしで作ります。これにより、未検証の既存latestを選ばずに復旧対象を最新として配置できます。`UNIQUE_SUFFIX` は29文字以下の小文字英数字の固有値に置き換え、リビジョン名全体を63文字以下にします。タグは接尾辞と別に `RECOVERY_TAG`（例: `rc-0123456789abcdef`）を決め、先頭を小文字英字、末尾を小文字英数字、途中を小文字英数字・ハイフンにします。タグにも **`len(サービス名) + len(タグ) <= 46`** が必要で、24文字の `okinawago-dictionary-app` では **タグは22文字以下** です。選んだタグが既に存在しないことを直前のtraffic出力で確認し、復旧記録にもタグとリビジョン名の対応を残します。可変のイメージタグは使いません。
 
 ```sh
-gcloud run services update okinawago-dictionary-app --project=okinawago-dictionary --region=asia-southeast1 --image=asia.gcr.io/okinawago-dictionary/okinawago-dictionary-app/okinawago-dictionary-app@sha256:APPROVED_DIGEST --revision-suffix=recovery-UNIQUE_SUFFIX --tag=recovery-UNIQUE_SUFFIX --no-traffic
+gcloud run services update okinawago-dictionary-app --project=okinawago-dictionary --region=asia-southeast1 --image=asia.gcr.io/okinawago-dictionary/okinawago-dictionary-app/okinawago-dictionary-app@sha256:APPROVED_DIGEST --revision-suffix=recovery-UNIQUE_SUFFIX --tag=RECOVERY_TAG --no-traffic
 gcloud run revisions describe okinawago-dictionary-app-recovery-UNIQUE_SUFFIX --project=okinawago-dictionary --region=asia-southeast1 --format='yaml(metadata.name,metadata.labels,spec.containers.image,status.conditions,status.imageDigest)'
 gcloud run services describe okinawago-dictionary-app --project=okinawago-dictionary --region=asia-southeast1 --format='yaml(metadata.generation,status.observedGeneration,status.conditions,status.latestCreatedRevisionName,status.latestReadyRevisionName,status.traffic)'
 ```
 
-3. 作成したリビジョン名・所属サービス・Ready=True・imageDigestが承認したイメージと一致すること、本番trafficが維持されていること、タグ `recovery-UNIQUE_SUFFIX` がそのリビジョンを指すことを確認します。そのタグに対応する `status.traffic[].url` を `RECOVERY_TAG_URL` に指定して、3辞書の検索・詳細本文、CSRF・CookieのHTTP確認を行います。失敗時は送客を変更せず中断します。
+3. 作成したリビジョン名・所属サービス・Ready=True・imageDigestが承認したイメージと一致すること、本番trafficが維持されていること、タグ `RECOVERY_TAG` がそのリビジョンを指すことを確認します。そのタグに対応する `status.traffic[].url` を `RECOVERY_TAG_URL` に指定して、3辞書の検索・詳細本文、CSRF・CookieのHTTP確認を行います。失敗時は送客を変更せず中断します。
 
 ```sh
 python3 scripts/smoke_http.py https://RECOVERY_TAG_URL.run.app --startup-timeout 90
@@ -150,7 +150,7 @@ gcloud run services describe okinawago-dictionary-app --project=okinawago-dictio
 python3 scripts/smoke_http.py https://okinawago.app --startup-timeout 90
 ```
 
-6. `spec.traffic` が `latestRevision: true`・100%であり、解決済みの `status.traffic` が同じ検証済み復旧リビジョンへ100%であることとHTTP成功を確認します。自分の復旧タグが同リビジョンを指していることを確認して `--remove-tags=recovery-UNIQUE_SUFFIX` で片付け、trafficを再確認します。旧Inlineの復元内容と送客動作の復旧結果を記録した後、本番トリガーだけを再有効化します。再有効化後の最初の旧方式ビルドでも、配置したイメージ・Ready・実際の送客先・本番HTTPを確認してください。
+6. `spec.traffic` が `latestRevision: true`・100%であり、解決済みの `status.traffic` が同じ検証済み復旧リビジョンへ100%であることとHTTP成功を確認します。自分の復旧タグが同リビジョンを指していることを確認して `--remove-tags=RECOVERY_TAG` で片付け、trafficを再確認します。旧Inlineの復元内容と送客動作の復旧結果を記録した後、本番トリガーだけを再有効化します。再有効化後の最初の旧方式ビルドでも、配置したイメージ・Ready・実際の送客先・本番HTTPを確認してください。
 
 旧方式では以後の新版へ自動送客され、新ワークフローの切り替え前HTTP検証は適用されません。ビルド専用トリガーの再有効化は、二重build/pushの必要性を確認してから行います。旧Inlineの直接traffic変更にはこのワークフローのロック・順序保護がないため、新旧の反映を並行稼働させないでください。状態バケットやwatermarkは消さず、再移行時も履歴を維持します。
 
@@ -175,6 +175,8 @@ python3 scripts/smoke_http.py https://okinawago.app --startup-timeout 90
 配置・HTTP確認・照合の失敗は非ゼロ終了し、切り替えを呼びません。既知の安全な状態では失敗後も自分のタグを削除し、ロックを解放します。後片付けの失敗をログ・記録に残し、元の失敗を上書きしません。traffic更新自体の通信障害では実際には切り替わった可能性があり、自動切り戻しは行いません。
 
 gcloudの変更要求でエラー・タイムアウト・割り込みが起きた場合は結果を断定せず、ロックとタグを残して復旧を要求します。所有権を失った場合やタグの対応先が別リビジョンだった場合も、それらを削除・解放しません。タグ削除や最終記録に失敗した場合もロックを残します。
+
+Cloud Runコマンドの非ゼロ終了は、操作名（例: `gcloud run services update`）、終了コード、原因のstderrをログ・失敗記録に残します。タイムアウト時は終了コードを不明とし、取得できたstderrを記録します。stderrは認証情報を伏せ、JSON/YAMLの設定出力を省略し、最大4000文字に制限します。stdoutのサービス定義や認証コマンドの出力はエラーへ含めません。診断情報を追加しても、結果不明時にロックを維持する判断は変わりません。
 
 現在のリビジョン最小インスタンス数は1です。検証用タグが残ると、0%のリビジョンでも追加稼働・課金につながる場合があります。通常終了ではタグを削除し、復旧時も所有者と操作状態を照合して早めに片付けます。リビジョン自体の自動削除や最小インスタンス設定の変更は行いません。
 
