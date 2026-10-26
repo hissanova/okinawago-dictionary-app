@@ -4,3 +4,6 @@ update-poetry :
 	./update-dict.sh
 update : update-poetry update-docker
 
+.PHONY: check
+check:
+	python3 scripts/check.py

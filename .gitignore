@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Review output belongs outside the repository.
+/git-diff.txt
