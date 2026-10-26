@@ -1,16 +1,19 @@
 import os
-from typing import List, Tuple
+from typing import List
 from flask import Flask, render_template, session, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import widgets, StringField, SubmitField, RadioField, SelectMultipleField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
-from app.search import search, get_contents
+from app.search import MAX_SEARCH_QUERY_LENGTH, get_contents, normalize_search_query, search
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'Haisai. Chu-uganbira.'
+secret_key = os.environ.get('SECRET_KEY')
+if not secret_key or not secret_key.strip():
+    raise RuntimeError('SECRET_KEY environment variable must be set and non-empty.')
+app.config['SECRET_KEY'] = secret_key
 
 bootstrap = Bootstrap(app)
 
@@ -35,10 +38,14 @@ search_types = [
 
 class EnquiryForm(FlaskForm):
     word = StringField('検索語の入力（かな表記）',
-                       validators=[DataRequired()],
+                       validators=[
+                           DataRequired(),
+                           Length(max=MAX_SEARCH_QUERY_LENGTH),
+                       ],
                        render_kw={
                            "placeholder": "検索語を入力して下さい",
-                           "style": "width:100%"
+                           "style": "width:100%",
+                           "maxlength": MAX_SEARCH_QUERY_LENGTH,
                        })
     dict_type = MultiCheckboxField(
         '検索する辞書の選択',
@@ -54,12 +61,14 @@ class EnquiryForm(FlaskForm):
 def index():
     enquiry_form = EnquiryForm()
     if enquiry_form.is_submitted():
-        session['search_type'] = enquiry_form.search_type.data
-        enquiry_form.search_type.data = ''
-        session['dict_type'] = enquiry_form.dict_type.data
-        session['word'] = enquiry_form.word.data
-        enquiry_form.word.data = ''
-        return redirect(url_for("search_results", word=session['word']))
+        enquiry_form.word.data = normalize_search_query(enquiry_form.word.data)
+        if enquiry_form.validate():
+            session['search_type'] = enquiry_form.search_type.data
+            enquiry_form.search_type.data = ''
+            session['dict_type'] = enquiry_form.dict_type.data
+            session['word'] = enquiry_form.word.data
+            enquiry_form.word.data = ''
+            return redirect(url_for("search_results", word=session['word']))
     return render_template('index.html', enquiry_form=enquiry_form)
 
 
@@ -150,4 +159,4 @@ def render_phonetics_list_IPA(phonetics_list):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
